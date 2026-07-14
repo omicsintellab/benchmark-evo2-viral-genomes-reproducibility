@@ -1,0 +1,108 @@
+# corpus_design.yaml — pré-registro do corpus de fine-tuning EVO2 (Fase 0)
+#
+# FONTE ÚNICA de cotas e cortes de qualidade. Pré-registrado ANTES da coleta para
+# que a curadoria seja reproduzível e auditável (METHODOLOGY.md, Fase 0): não editar
+# cotas/cortes depois de ver os dados — isso evita "curadoria por conveniência".
+#
+# Consumido por:
+#   - code/compose_v1_groups.py  (cotas V1 + critério ictv_recent)   [flag --design]
+#   - balanceamento/split da Fase 5-8 (AWS_EXECUTION.md §6-8)
+#
+# Qualquer mudança aqui é uma mudança de pré-registro: versionar (bump `meta.version`)
+# e registrar no histórico do git com justificativa.
+
+meta:
+  version: 2
+  created: 2026-06-12
+  updated: 2026-06-29                  # v2: política de balanceamento do V1 (ver v1_refseq.balancing)
+  vmr_msl: MSL41                       # VMR_MSL41.v1.20260320.xlsx (ictv.global/vmr)
+  refseq_source: "NCBI RefSeq release / viral (viral.*.genomic.gbff.gz)"
+  changelog:
+    - "v2 (2026-06-29): balanceamento do V1 revisado pelo PI — manter TODO eucariótico
+       disponível (sem capar os grupos euk OK), capar phage a 1000 como ÂNCORA anti-esquecimento
+       (não cota de cobertura), e incluir o grupo unassigned_?_euk (712 vírus euk de RNA).
+       Excluir unassigned (2526, host unknown). Justificativa: o objetivo do FT V1 é corrigir o
+       gap eucariótico do EVO2 base; capar os grupos euk descartaria justamente o dado que mais
+       corrige o gap. Fago é in-distribution (ensina pouco), então entra só como replay p/ não
+       esquecer prokariótico (necessário ao V2 ambiental, que é fágico). As COTAS (quotas) ficam
+       como alvo histórico/auditoria; a política efetiva de amostragem é v1_refseq.balancing."
+
+# --- parâmetros comuns aos dois corpora (V1 e V2) ---
+dedup:    { min_seq_id: 0.95, coverage: 0.85, cov_mode: 1 }       # MMseqs2/CheckV (Fase 5)
+split:    { ratios: [0.90, 0.05, 0.05], seed: 20260601, cluster_aware: true }   # train/val/test (Fase 7)
+chunk:    { size: 8192, stride: 4096, pack: true }                # chunking BioNemo (Fase 8)
+
+# filtros de sanitização (Fase 2) — aplicados a ambos os corpora
+sanitize:
+  max_N_fraction: 0.10                 # descarta sequências com >10% de N
+  univec_evalue: 1.0e-5                # UniVec blastn p/ contaminação de vetor/adaptador
+
+# ======================================================================
+# V1 — RefSeq viral (corrige o gap eucariótico do EVO2 base)
+# ======================================================================
+v1_refseq:
+  sources: [NCBI_RefSeq_viral, ICTV_VMR_MSL41]
+  min_length: 1000                     # bp; descarta fragmentos curtos
+  completeness: complete               # pré-registro 2026-06-12: só genomas "complete"
+                                       # (combinado com o corte de N de sanitize.max_N_fraction)
+  segments: per_segment                # vírus segmentados (Influenza, Bunyavirales) = 1 sequência/segmento;
+                                       # bate com extract_genome_features.py (1 linha/record)
+  target_eukaryotic_pct: 40            # ≥40% do corpus deve ser de vírus eucarióticos
+  # ictv_recent (overlay, não-exclusivo): família "recente" = presente na VMR atual (MSL41)
+  # e AUSENTE na VMR baseline. A VMR é snapshot e NÃO carrega o MSL de criação; logo é
+  # derivado por DIFF de famílias entre releases (compose --vmr-baseline).
+  # RESTRITO a vírus de EUCARIOTOS (objetivo = gap eucariótico do EVO2; exclui a
+  # expansão de famílias de fagos pós-2022, que dominaria o grupo).
+  ictv_recent_baseline_msl: 38         # baseline 2022; recentes = criadas em MSL39/40/41 (2023+)
+  ictv_recent_host: eukaryote          # só hospedeiro eucarioto
+  # Abaixo do alvo por limite do RefSeq (decisão 2026-06-12): aceitar o N disponível,
+  # não forçar a cota nem complementar de outra fonte nesta etapa.
+  #   retro, archaeal_virus: poucos genomas desses tipos no RefSeq (limite biológico).
+  #   ictv_recent: poucas famílias eucarióticas recém-criadas têm genoma no RefSeq (484/800).
+  accept_below_target: [retro, archaeal_virus, ictv_recent]
+  # --- política de balanceamento efetiva (v2, 2026-06-29) ---
+  # Substitui o "priority sampling às cotas" da Fase 5 para o V1. As `quotas` abaixo
+  # permanecem como alvo histórico/auditoria, mas NÃO são teto para os grupos euk.
+  balancing:
+    keep_all:                          # grupos mantidos SEM cap (todo o disponível entra)
+      - dsDNA_euk
+      - ssDNA_euk
+      - ssRNA_pos_euk
+      - ssRNA_neg_euk
+      - dsRNA_euk
+      - retro
+      - archaeal_virus
+      - unassigned_?_euk               # 712 vírus euk de RNA (ambisense/ssRNA) — reforça o gap euk
+    cap:                               # grupos amostrados a um teto (priority sampling, seed do split)
+      phage: 1000                      # ÂNCORA anti-esquecimento (replay), não cota de cobertura.
+                                       # Fago é in-distribution do EVO2 base (perplex. 1.344 vs euk 1.807):
+                                       # gradiente baixo -> ensina pouco, mas mantém competência prokariótica
+                                       # que o V2 ambiental (viroma fágico) vai precisar. ~9% do corpus.
+                                       # Medir base->V1 no eixo host/fago via o probing benchmark.
+    exclude:                           # fora do V1
+      - unassigned                     # 2526, host unknown — auditar antes de qualquer uso futuro
+  quotas:                              # nº alvo por grupo de cota (Baltimore × host); alvo histórico (ver balancing)
+    dsDNA_euk: 800                     # I  (dsDNA)  eucarioto — Herpes/Adeno/Pox/Irido/Asfar/Mimi/Phycodna
+    ssDNA_euk: 500                     # II (ssDNA)  eucarioto — Gemini/Circo/Parvo/Anello/Nano/Genomo
+    ssRNA_pos_euk: 1500                # IV (ssRNA+) eucarioto — Corona/Picorna/Flavi/Toga/Calici/Astro
+    ssRNA_neg_euk: 1000                # V  (ssRNA−) eucarioto — Orthomyxo/Paramyxo/Rhabdo/Filo/Bunyavirales
+    dsRNA_euk: 300                     # III (dsRNA) eucarioto — Reo/Birna
+    retro: 400                         # VI/VII (RT) — Retroviridae
+    phage: 2000                        # host bactéria — Caudoviricetes/Micro/Tecti
+    archaeal_virus: 200                # host archaea
+    ictv_recent: 800                   # overlay: famílias criadas após 2023 (ver ictv_recent_baseline_msl)
+
+# ======================================================================
+# V2 — Environmental (FT especializado; continua de V1 com 30% replay)
+# ======================================================================
+v2_environmental:
+  sources: [MGnify, IMG_VR_v4, GVDB, geNomad_BR]
+  min_length: 5000                     # bp; contigs ambientais mais longos
+  viral_score_min: 0.80                # score geNomad/viral mínimo
+  biomes: [Freshwater_tropical, Marine_tropical, Soil_tropical, Forest_tropical]
+  quotas:
+    mgnify_aquatic: 5000
+    mgnify_terrestrial: 4000
+    imgvr_tropical: 3000
+    gvdb: 1500
+    genomad_br_round2: 5000            # adicionado na Fase 11 (segunda rodada geNomad BR)
