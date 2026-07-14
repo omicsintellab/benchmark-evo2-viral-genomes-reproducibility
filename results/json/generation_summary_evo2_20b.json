@@ -1,0 +1,34 @@
+{
+  "model": "evo2_20b",
+  "n_subset": 200,
+  "perplexity": {
+    "euk_heldout": {
+      "mean": 1.7967480039596557,
+      "std": 0.16326508117792873,
+      "n": 100
+    },
+    "phage_seen": {
+      "mean": 1.1832760542631149,
+      "std": 0.46665216042693475,
+      "n": 100
+    }
+  },
+  "completion": {
+    "bits_evo": {
+      "euk_heldout": 1.782,
+      "phage_seen": 1.152
+    },
+    "bits_markov": {
+      "euk_heldout": 1.973,
+      "phage_seen": 1.981
+    },
+    "kmer_evo": {
+      "euk_heldout": 0.709,
+      "phage_seen": 0.79
+    },
+    "kmer_markov": {
+      "euk_heldout": 0.74,
+      "phage_seen": 0.682
+    }
+  }
+}

@@ -1,0 +1,29 @@
+# CPU environment for the corpus, analysis and figure stages of this benchmark.
+#
+#   conda env create -f environment.yml
+#   conda activate evo2-viral-benchmark
+#
+# This is enough to regenerate every figure and table in the paper from the cached
+# metrics in results/json/.
+#
+# The GPU stages (code/02_embeddings/, code/04_generation/) additionally require the
+# Evo 2 runtime (vortex / StripedHyena) and model weights, which are NOT provisioned
+# here — see https://github.com/ArcInstitute/evo2. Results in the paper were produced
+# on an NVIDIA H100 80GB (20B model, FP8) and an NVIDIA L40S 48GB (7B model, bfloat16).
+name: evo2-viral-benchmark
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pip>=24
+  - numpy>=1.26
+  - pandas>=2.2
+  - pyarrow>=16.0
+  - scipy>=1.13
+  - scikit-learn>=1.5
+  - matplotlib>=3.9
+  - biopython>=1.83
+  - pyyaml>=6.0
+  - mmseqs2>=15          # sequence-identity clustering for group-aware CV
+  - jupyterlab

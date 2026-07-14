@@ -1,0 +1,136 @@
+{
+  "model": "evo2_20b",
+  "layer": "blocks.21.mlp.l3",
+  "window": 32768,
+  "n_baltimore": 981,
+  "n_features": 1200,
+  "baltimore": {
+    "acc": 0.835,
+    "f1": 0.839,
+    "acc_gc_len": 0.388,
+    "gain": 0.446
+  },
+  "features": [
+    {
+      "feature": "coding_fraction",
+      "n": 1200,
+      "R2_lenGC": 0.032,
+      "R2_emb": 0.57,
+      "R2_comb": 0.571,
+      "R2_inc": 0.539
+    },
+    {
+      "feature": "gene_density",
+      "n": 1200,
+      "R2_lenGC": 0.063,
+      "R2_emb": 0.55,
+      "R2_comb": 0.546,
+      "R2_inc": 0.483
+    },
+    {
+      "feature": "n_genes",
+      "n": 1200,
+      "R2_lenGC": 0.758,
+      "R2_emb": 0.766,
+      "R2_comb": 0.87,
+      "R2_inc": 0.112
+    },
+    {
+      "feature": "noncoding_bp",
+      "n": 1200,
+      "R2_lenGC": 0.557,
+      "R2_emb": 0.51,
+      "R2_comb": 0.712,
+      "R2_inc": 0.155
+    },
+    {
+      "feature": "mean_intergenic_len",
+      "n": 1200,
+      "R2_lenGC": 0.251,
+      "R2_emb": 0.345,
+      "R2_comb": 0.373,
+      "R2_inc": 0.122
+    },
+    {
+      "feature": "codon_enc_cds",
+      "n": 1179,
+      "R2_lenGC": 0.117,
+      "R2_emb": 0.818,
+      "R2_comb": 0.82,
+      "R2_inc": 0.704
+    },
+    {
+      "feature": "codon_enc_genome",
+      "n": 1200,
+      "R2_lenGC": 0.148,
+      "R2_emb": 0.74,
+      "R2_comb": 0.75,
+      "R2_inc": 0.602
+    },
+    {
+      "feature": "gc_regional_std",
+      "n": 1200,
+      "R2_lenGC": 0.217,
+      "R2_emb": 0.405,
+      "R2_comb": 0.438,
+      "R2_inc": 0.221
+    },
+    {
+      "feature": "recomb_ir_density",
+      "n": 1200,
+      "R2_lenGC": 0.049,
+      "R2_emb": 0.465,
+      "R2_comb": 0.463,
+      "R2_inc": 0.414
+    }
+  ],
+  "host": {
+    "n": 1080,
+    "n_classes": 3,
+    "acc": 0.969,
+    "f1": 0.937
+  },
+  "family": {
+    "n": 349,
+    "n_classes": 8,
+    "acc": 0.782,
+    "f1": 0.763
+  },
+  "compare_7b": {
+    "baltimore_7b": {
+      "acc": 0.892,
+      "f1": 0.896,
+      "acc_gc_len": 0.388,
+      "gain": 0.504
+    },
+    "baltimore_20b": {
+      "acc": 0.835,
+      "f1": 0.839,
+      "acc_gc_len": 0.388,
+      "gain": 0.446
+    },
+    "delta_baltimore_acc": -0.057,
+    "features_7b": {
+      "coding_fraction": 0.606,
+      "gene_density": 0.652,
+      "n_genes": 0.148,
+      "noncoding_bp": 0.225,
+      "mean_intergenic_len": 0.121,
+      "codon_enc_cds": 0.728,
+      "codon_enc_genome": 0.634,
+      "gc_regional_std": 0.27,
+      "recomb_ir_density": 0.453
+    },
+    "features_20b": {
+      "coding_fraction": 0.539,
+      "gene_density": 0.483,
+      "n_genes": 0.112,
+      "noncoding_bp": 0.155,
+      "mean_intergenic_len": 0.122,
+      "codon_enc_cds": 0.704,
+      "codon_enc_genome": 0.602,
+      "gc_regional_std": 0.221,
+      "recomb_ir_density": 0.414
+    }
+  }
+}

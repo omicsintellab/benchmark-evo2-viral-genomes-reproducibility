@@ -1,0 +1,110 @@
+{
+  "model": "evo2_20b",
+  "window": 32768,
+  "layers": [
+    "blocks.15.mlp.l3",
+    "blocks.18.mlp.l3"
+  ],
+  "precision": "bf16",
+  "ref_7b": {
+    "baltimore": {
+      "acc": 0.894,
+      "f1": 0.898,
+      "acc_gc_len": 0.388,
+      "gain": 0.506
+    },
+    "features": {
+      "coding_fraction": 0.606,
+      "gene_density": 0.652,
+      "n_genes": 0.148,
+      "noncoding_bp": 0.225,
+      "mean_intergenic_len": 0.121,
+      "codon_enc_cds": 0.728,
+      "codon_enc_genome": 0.634,
+      "gc_regional_std": 0.27,
+      "recomb_ir_density": 0.453
+    },
+    "host": {
+      "n": 1080,
+      "n_classes": 3,
+      "acc": 0.973,
+      "f1": 0.951
+    },
+    "family": {
+      "n": 349,
+      "n_classes": 8,
+      "acc": 0.857,
+      "f1": 0.84
+    },
+    "n_baltimore": 981,
+    "n_features": 1200
+  },
+  "per_layer": {
+    "blocks.15.mlp.l3": {
+      "baltimore": {
+        "acc": 0.829,
+        "f1": 0.829,
+        "acc_gc_len": 0.388,
+        "gain": 0.44
+      },
+      "features": {
+        "coding_fraction": 0.167,
+        "gene_density": 0.322,
+        "n_genes": 0.045,
+        "noncoding_bp": -0.004,
+        "mean_intergenic_len": 0.018,
+        "codon_enc_cds": 0.614,
+        "codon_enc_genome": 0.556,
+        "gc_regional_std": 0.127,
+        "recomb_ir_density": 0.342
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.94,
+        "f1": 0.879
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.842,
+        "f1": 0.829
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    },
+    "blocks.18.mlp.l3": {
+      "baltimore": {
+        "acc": 0.811,
+        "f1": 0.814,
+        "acc_gc_len": 0.388,
+        "gain": 0.423
+      },
+      "features": {
+        "coding_fraction": 0.198,
+        "gene_density": 0.39,
+        "n_genes": 0.066,
+        "noncoding_bp": 0.063,
+        "mean_intergenic_len": 0.084,
+        "codon_enc_cds": 0.604,
+        "codon_enc_genome": 0.559,
+        "gc_regional_std": 0.233,
+        "recomb_ir_density": 0.375
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.931,
+        "f1": 0.867
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.874,
+        "f1": 0.865
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    }
+  }
+}

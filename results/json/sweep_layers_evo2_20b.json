@@ -1,0 +1,211 @@
+{
+  "model": "evo2_20b",
+  "window": 32768,
+  "layers": [
+    "blocks.11.mlp.l3",
+    "blocks.15.mlp.l3",
+    "blocks.18.mlp.l3",
+    "blocks.21.mlp.l3",
+    "blocks.23.mlp.l3"
+  ],
+  "ref_7b": {
+    "baltimore": {
+      "acc": 0.894,
+      "f1": 0.898,
+      "acc_gc_len": 0.388,
+      "gain": 0.506
+    },
+    "features": {
+      "coding_fraction": 0.606,
+      "gene_density": 0.652,
+      "n_genes": 0.148,
+      "noncoding_bp": 0.225,
+      "mean_intergenic_len": 0.121,
+      "codon_enc_cds": 0.728,
+      "codon_enc_genome": 0.634,
+      "gc_regional_std": 0.27,
+      "recomb_ir_density": 0.453
+    },
+    "host": {
+      "n": 1080,
+      "n_classes": 3,
+      "acc": 0.973,
+      "f1": 0.951
+    },
+    "family": {
+      "n": 349,
+      "n_classes": 8,
+      "acc": 0.857,
+      "f1": 0.84
+    },
+    "n_baltimore": 981,
+    "n_features": 1200
+  },
+  "per_layer": {
+    "blocks.11.mlp.l3": {
+      "baltimore": {
+        "acc": 0.965,
+        "f1": 0.967,
+        "acc_gc_len": 0.388,
+        "gain": 0.577
+      },
+      "features": {
+        "coding_fraction": 0.559,
+        "gene_density": 0.699,
+        "n_genes": 0.122,
+        "noncoding_bp": 0.139,
+        "mean_intergenic_len": 0.26,
+        "codon_enc_cds": 0.538,
+        "codon_enc_genome": 0.469,
+        "gc_regional_std": 0.31,
+        "recomb_ir_density": 0.512
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.992,
+        "f1": 0.986
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.903,
+        "f1": 0.883
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    },
+    "blocks.15.mlp.l3": {
+      "baltimore": {
+        "acc": 0.969,
+        "f1": 0.971,
+        "acc_gc_len": 0.388,
+        "gain": 0.581
+      },
+      "features": {
+        "coding_fraction": 0.555,
+        "gene_density": 0.73,
+        "n_genes": 0.138,
+        "noncoding_bp": 0.192,
+        "mean_intergenic_len": 0.295,
+        "codon_enc_cds": 0.673,
+        "codon_enc_genome": 0.575,
+        "gc_regional_std": 0.343,
+        "recomb_ir_density": 0.567
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.991,
+        "f1": 0.984
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.903,
+        "f1": 0.889
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    },
+    "blocks.18.mlp.l3": {
+      "baltimore": {
+        "acc": 0.958,
+        "f1": 0.96,
+        "acc_gc_len": 0.388,
+        "gain": 0.57
+      },
+      "features": {
+        "coding_fraction": 0.579,
+        "gene_density": 0.707,
+        "n_genes": 0.15,
+        "noncoding_bp": 0.189,
+        "mean_intergenic_len": 0.296,
+        "codon_enc_cds": 0.711,
+        "codon_enc_genome": 0.607,
+        "gc_regional_std": 0.363,
+        "recomb_ir_density": 0.616
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.994,
+        "f1": 0.988
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.908,
+        "f1": 0.894
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    },
+    "blocks.21.mlp.l3": {
+      "baltimore": {
+        "acc": 0.834,
+        "f1": 0.838,
+        "acc_gc_len": 0.388,
+        "gain": 0.445
+      },
+      "features": {
+        "coding_fraction": 0.539,
+        "gene_density": 0.483,
+        "n_genes": 0.112,
+        "noncoding_bp": 0.155,
+        "mean_intergenic_len": 0.122,
+        "codon_enc_cds": 0.704,
+        "codon_enc_genome": 0.602,
+        "gc_regional_std": 0.221,
+        "recomb_ir_density": 0.414
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.969,
+        "f1": 0.937
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.782,
+        "f1": 0.763
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    },
+    "blocks.23.mlp.l3": {
+      "baltimore": {
+        "acc": 0.603,
+        "f1": 0.615,
+        "acc_gc_len": 0.388,
+        "gain": 0.215
+      },
+      "features": {
+        "coding_fraction": 0.061,
+        "gene_density": 0.239,
+        "n_genes": 0.062,
+        "noncoding_bp": 0.035,
+        "mean_intergenic_len": 0.048,
+        "codon_enc_cds": 0.494,
+        "codon_enc_genome": 0.427,
+        "gc_regional_std": 0.058,
+        "recomb_ir_density": 0.176
+      },
+      "host": {
+        "n": 1080,
+        "n_classes": 3,
+        "acc": 0.844,
+        "f1": 0.746
+      },
+      "family": {
+        "n": 349,
+        "n_classes": 8,
+        "acc": 0.656,
+        "f1": 0.641
+      },
+      "n_baltimore": 981,
+      "n_features": 1200
+    }
+  }
+}

@@ -1,0 +1,30 @@
+# Large artefacts — never commit (see data/README.md)
+*.npz
+*.pt
+*.safetensors
+*.gbff
+*.gbff.gz
+*.fasta
+*.fa
+*.fna
+*.jsonl
+
+# Derived analysis inputs — regenerate with code/01_corpus/make_analysis_inputs.py
+data/manifest.parquet
+data/features.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+env/
+
+# OS / editors
+.DS_Store
+*.swp
+
+# Local credentials — must never enter this repo
+.env
+*.pem
+.aws/

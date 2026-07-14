@@ -1,0 +1,81 @@
+cff-version: 1.2.0
+message: "If you use this benchmark, please cite the paper below."
+title: "Benchmarking Evo 2 on viral genomes — reproducibility repository"
+abstract: >-
+  Code, pre-registered corpus design, curated accession-level inputs and cached
+  cross-validated metrics reproducing the capability benchmark of the Evo 2 genomic
+  foundation model (20B base, with the 7B as scale comparator) on 19,429 RefSeq viral
+  genomes, across representation probing, genomic-feature decoding and generative
+  completion.
+type: software
+authors:
+  - family-names: Amgarten
+    given-names: Deyvid
+    email: deyvid.emanuel@einstein.br
+  - family-names: Schinaid
+    given-names: Anderson
+  - family-names: de Mello Malta
+    given-names: Fernanda
+  - family-names: Marra
+    given-names: Alexandre R.
+  - family-names: Pinho
+    given-names: João Renato Rebello
+keywords:
+  - Evo 2
+  - genomic foundation models
+  - genomic language models
+  - viral genomics
+  - linear probing
+  - model benchmarking
+  - sequence generation
+license: MIT
+preferred-citation:
+  type: article
+  title: >-
+    Genomic foundation model embeddings encode higher-order viral genome architecture
+    beyond sequence composition: a benchmark of Evo 2
+  authors:
+    - family-names: Amgarten
+      given-names: Deyvid
+    - family-names: Schinaid
+      given-names: Anderson
+    - family-names: de Mello Malta
+      given-names: Fernanda
+    - family-names: Marra
+      given-names: Alexandre R.
+    - family-names: Pinho
+      given-names: João Renato Rebello
+  journal: "Frontiers in Bioinformatics"
+  year: 2026
+  notes: "Brief Research Report, submitted. DOI to be added on acceptance."
+references:
+  - type: article
+    title: "Genome modeling and design across all domains of life with Evo 2"
+    authors:
+      - family-names: Brixi
+        given-names: Garyk
+    journal: bioRxiv
+    year: 2025
+    doi: 10.1101/2025.02.18.638918
+  - type: article
+    title: "Reference sequence (RefSeq) database at NCBI"
+    authors:
+      - family-names: O'Leary
+        given-names: Nuala A.
+    journal: Nucleic Acids Research
+    volume: 44
+    start: D733
+    end: D745
+    year: 2016
+    doi: 10.1093/nar/gkv1189
+  - type: article
+    title: "Virus taxonomy: the database of the International Committee on Taxonomy of Viruses (ICTV)"
+    authors:
+      - family-names: Lefkowitz
+        given-names: Elliot J.
+    journal: Nucleic Acids Research
+    volume: 46
+    start: D708
+    end: D717
+    year: 2018
+    doi: 10.1093/nar/gkx932
