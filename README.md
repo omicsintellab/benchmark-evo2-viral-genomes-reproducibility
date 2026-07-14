@@ -4,7 +4,8 @@ Code, curated inputs and cached metrics for:
 
 > **Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2**
 > Amgarten D., Schinaid A., de Mello Malta F., Marra A. R., Pinho J. R. R.
-> *Frontiers in Bioinformatics* (Brief Research Report, submitted).
+>
+> Submitted to *Frontiers in Bioinformatics* (Brief Research Report, Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*. A preprint is available on **bioRxiv** (DOI to be added here once registered).
 
 The study benchmarks the **Evo 2 20B base model** (with the 7B model as a scale comparator; neither fine-tuned) on a pre-registered corpus of **19,429 RefSeq viral genomes**, along three axes:
 
@@ -22,23 +23,27 @@ The expensive stages (embedding extraction, generation) are separated from the a
 conda env create -f environment.yml
 conda activate evo2-viral-benchmark
 
-python code/05_figures/make_figure1_combined.py   # Figure 1
-python code/05_figures/make_figures_20b.py        # Figure 2 + Table 1
-python code/05_figures/make_figure3_combined.py   # Figure 3
+python code/05_figures/make_figure1_combined.py       # Figure 1
+python code/05_figures/make_figures_20b.py            # Figure 2 + Table 1
+python code/05_figures/make_figure3_combined.py       # Figure 3
+python code/05_figures/make_supplementary_tables.py   # Supplementary Tables S1-S4
 ```
 
-Figures are written to [`figures/`](figures); the metric tables to [`results/tables/`](results/tables).
+Figures are written to [`figures/`](figures); the metric tables to [`results/tables/`](results/tables). Nothing in the paper's tables is typed by hand — every value is regenerated from the cached JSONs.
 
 ### Figure → script → data map
 
-| Paper item | File | Produced by | Reads |
-|---|---|---|---|
-| Figure 1 (probes: confusion matrix, accuracy, R², PCA) | `figures/figure1_combined.{png,svg}` | `code/05_figures/make_figure1_combined.py` | `fig_artifacts_20b.json`, `scale_metrics.json`, `viral_features_extended_metrics.json` |
-| Figure 2 (generation: perplexity, completion) | `figures/figure3_20b.{png,svg}` | `code/05_figures/make_figures_20b.py` | `generation_summary_evo2_20b.json` |
-| Figure 3 (layer sensitivity + 20B vs 7B scale) | `figures/figure3_combined.{png,svg}` | `code/05_figures/make_figure3_combined.py` | `scale_metrics.json`, `pca_control_metrics.json` |
-| Table 1 (probe performance ± SD, paired tests) | `results/tables/probe_metrics_20b.md` | `code/05_figures/make_figures_20b.py` | same as Figure 1 |
+The generated file names keep the identifiers used during analysis and **do not follow the paper's numbering** — `figure3_20b` is Figure 2 of the paper. This table is the authoritative mapping; the figures exactly as submitted are also archived, correctly numbered, under [`figures/final/`](figures/final).
 
-> File names keep the identifiers used during analysis (e.g. Figure 2 of the paper is generated as `figure3_20b`); the table above is the authoritative mapping.
+| Paper item | As submitted | Generated as | Produced by | Reads |
+|---|---|---|---|---|
+| Figure 1 (probes: confusion matrix, accuracy, R², PCA) | `figures/final/figure1.{png,svg}` | `figures/figure1_combined.{png,svg}` | `make_figure1_combined.py` | `fig_artifacts_20b.json`, `scale_metrics.json`, `viral_features_extended_metrics.json` |
+| Figure 2 (generation: perplexity, completion) | `figures/final/figure2.{png,svg}` | `figures/figure3_20b.{png,svg}` | `make_figures_20b.py` | `generation_summary_evo2_20b.json` |
+| Figure 3 (layer sensitivity + 20B vs 7B scale) | `figures/final/figure3.{png,svg}` | `figures/figure3_combined.{png,svg}` | `make_figure3_combined.py` | `scale_metrics.json`, `pca_control_metrics.json` |
+| Table 1 (probe performance ± SD, paired tests) | — | `results/tables/probe_metrics_20b.md` | `make_figures_20b.py` | same as Figure 1 |
+| Supplementary Tables S1–S4 | — | `results/tables/supplementary_tables.md` | `make_supplementary_tables.py` | `precision_control_metrics.json`, `scale_metrics.json`, `pca_control_metrics.json`, `data/corpus_manifest.tsv.gz` |
+
+The four supplementary tables report the controls behind the paper's methodological claims: **S1** the FP8-vs-bfloat16 precision control, **S2** random vs sequence-identity cluster-aware cross-validation, **S3** the dimensionality-matched (150-component PCA) comparison, and **S4** the composition of the corpus by Baltimore class and host domain.
 
 ---
 
