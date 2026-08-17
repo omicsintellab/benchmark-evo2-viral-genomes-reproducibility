@@ -1,0 +1,602 @@
+{
+ "design": {
+  "primary_scheme": "cl95",
+  "primary_scheme_rationale": "Esquema PRE-REGISTRADO (corpus_design.yaml: dedup min_seq_id 0.95, split cluster_aware). Agrupar por familia responde outra pergunta (independencia taxonomica) e nao era o desenho fixado antes dos dados; promove-lo a principal seria a mesma selecao pos-hoc que R1 3.5 critica.",
+  "primary_set": [
+   "coding_fraction",
+   "gene_density",
+   "noncoding_bp",
+   "n_genes",
+   "mean_intergenic_len",
+   "overlap_bp"
+  ],
+  "contrast": "evo2_20b_blocks18 vs 6mer",
+  "test": "t reamostrado corrigido (Nadeau & Bengio, 2003), fator (1/n + 1/(k-1))",
+  "correction": "Holm dentro do conjunto primario de 6",
+  "ci": "bootstrap de 10.000 reamostragens sobre as diferencas por fold",
+  "negative_control": [
+   "cpg_oe",
+   "upa_oe"
+  ],
+  "negative_control_note": "Alvos de composicao de dinucleotideo, declarados ANTES como casos em que se espera que o 6-mer ven\u00e7a. Nao sao testes de hipotese: sao controle de especificidade do probe. FORA da correcao.",
+  "exploratory": "Baseline GC+len; classificacao de Baltimore/hospedeiro/familia; varredura de camadas; 20B vs 7B; controle de precisao; controle de PCA; CV aleatoria; avaliacao de geracao. Reportados com IC, sem p confirmatorio.",
+  "baseline_classes": {
+   "compositional": [
+    "kmer3",
+    "kmer4",
+    "kmer5",
+    "kmer6",
+    "multik",
+    "codon",
+    "dicodon",
+    "gc_len"
+   ],
+   "annotation_like": [
+    "orf",
+    "compo_all"
+   ]
+  }
+ },
+ "primary": {
+  "coding_fraction": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.37621084648565706,
+   "r2_b": 0.08110348113241243,
+   "delta": 0.2951073653532446,
+   "ci95": [
+    0.25518542648282716,
+    0.3347757978518721
+   ],
+   "cohens_d": 3.558634146103537,
+   "t_nadeau_bengio": 6.323858828398848,
+   "p_raw": 1.8786962350309656e-05,
+   "n_folds": 15,
+   "p_holm": 1.8786962350309656e-05,
+   "significant_holm": true
+  },
+  "gene_density": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.7756179415883562,
+   "r2_b": 0.40073705817192434,
+   "delta": 0.37488088341643183,
+   "ci95": [
+    0.3497487966478732,
+    0.40272710172671206
+   ],
+   "cohens_d": 6.855294060614255,
+   "t_nadeau_bengio": 12.182177230540276,
+   "p_raw": 7.706661876264207e-09,
+   "n_folds": 15,
+   "p_holm": 2.7563966459780343e-08,
+   "significant_holm": true
+  },
+  "noncoding_bp": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.7663210827835305,
+   "r2_b": 0.25459200443867075,
+   "delta": 0.5117290783448598,
+   "ci95": [
+    0.47573198468186856,
+    0.5510447827445335
+   ],
+   "cohens_d": 6.651673887574365,
+   "t_nadeau_bengio": 11.820334687572403,
+   "p_raw": 1.13489820727215e-08,
+   "n_folds": 15,
+   "p_holm": 2.7563966459780343e-08,
+   "significant_holm": true
+  },
+  "n_genes": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.8951743875545844,
+   "r2_b": 0.3741668147517064,
+   "delta": 0.521007572802878,
+   "ci95": [
+    0.49247502198774984,
+    0.5522511236744374
+   ],
+   "cohens_d": 8.370613870109025,
+   "t_nadeau_bengio": 14.874971196341322,
+   "p_raw": 5.685186329681996e-10,
+   "n_folds": 15,
+   "p_holm": 2.842593164840998e-09,
+   "significant_holm": true
+  },
+  "mean_intergenic_len": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.5542204289743042,
+   "r2_b": 0.12201969001776367,
+   "delta": 0.43220073895654054,
+   "ci95": [
+    0.40126285552022783,
+    0.4625056088175568
+   ],
+   "cohens_d": 6.915110457601412,
+   "t_nadeau_bengio": 12.28847375742108,
+   "p_raw": 6.890991614945086e-09,
+   "n_folds": 15,
+   "p_holm": 2.7563966459780343e-08,
+   "significant_holm": true
+  },
+  "overlap_bp": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.6226123652767489,
+   "r2_b": 0.21613173696236218,
+   "delta": 0.4064806283143867,
+   "ci95": [
+    0.3909580502015869,
+    0.42215750451629397
+   ],
+   "cohens_d": 12.446321373690171,
+   "t_nadeau_bengio": 22.11769349380313,
+   "p_raw": 2.736772243449418e-12,
+   "n_folds": 15,
+   "p_holm": 1.6420633460696507e-11,
+   "significant_holm": true
+  }
+ },
+ "sensitivity_family": {
+  "coding_fraction": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.2065047329505308,
+   "r2_b": -0.11288380225902096,
+   "delta": 0.31938853520955174,
+   "ci95": [
+    0.2331387551037423,
+    0.4029359981177775
+   ],
+   "cohens_d": 1.8376639935736123,
+   "t_nadeau_bengio": 3.2656146128748635,
+   "p_raw": 0.005634905490062427,
+   "n_folds": 15,
+   "p_holm": 0.01690471647018728
+  },
+  "gene_density": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.5320528163907112,
+   "r2_b": 0.09422657578509032,
+   "delta": 0.4378262406056209,
+   "ci95": [
+    0.36828068477339243,
+    0.5063340839965619
+   ],
+   "cohens_d": 3.049650161973554,
+   "t_nadeau_bengio": 5.419370553008607,
+   "p_raw": 9.040325245059124e-05,
+   "n_folds": 15,
+   "p_holm": 0.0005424195147035475
+  },
+  "noncoding_bp": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.5990504023461097,
+   "r2_b": -0.10921234466483014,
+   "delta": 0.7082627470109398,
+   "ci95": [
+    0.5768659455119243,
+    0.8595867682550173
+   ],
+   "cohens_d": 2.383221562705851,
+   "t_nadeau_bengio": 4.235095854360243,
+   "p_raw": 0.000831854379364073,
+   "n_folds": 15,
+   "p_holm": 0.0041592718968203645
+  },
+  "n_genes": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.7823308208117973,
+   "r2_b": 0.10673150228987255,
+   "delta": 0.6755993185219247,
+   "ci95": [
+    0.5073140538832438,
+    0.8761013381568664
+   ],
+   "cohens_d": 1.751897250949791,
+   "t_nadeau_bengio": 3.113203111648043,
+   "p_raw": 0.007629636337139591,
+   "n_folds": 15,
+   "p_holm": 0.01690471647018728
+  },
+  "mean_intergenic_len": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.3312091390853656,
+   "r2_b": -0.23606053943580074,
+   "delta": 0.5672696785211664,
+   "ci95": [
+    0.4441286415807171,
+    0.7051928424665248
+   ],
+   "cohens_d": 2.100621767643737,
+   "t_nadeau_bengio": 3.7329028399802655,
+   "p_raw": 0.0022274485676669056,
+   "n_folds": 15,
+   "p_holm": 0.008909794270667622
+  },
+  "overlap_bp": {
+   "a": "evo2_20b_blocks18",
+   "b": "6mer",
+   "r2_a": 0.33765744154743904,
+   "r2_b": -0.04944445392100727,
+   "delta": 0.3871018954684463,
+   "ci95": [
+    0.2733499847024837,
+    0.5168253752514935
+   ],
+   "cohens_d": 1.5226356520608106,
+   "t_nadeau_bengio": 2.705794559202615,
+   "p_raw": 0.0170619071391702,
+   "n_folds": 15,
+   "p_holm": 0.0170619071391702
+  }
+ },
+ "negative_control": {
+  "cpg_oe": {
+   "cl95": {
+    "a": "evo2_20b_blocks18",
+    "b": "6mer",
+    "r2_a": 0.9610065756961053,
+    "r2_b": 0.9626853237413686,
+    "delta": -0.0016787480452633563,
+    "ci95": [
+     -0.005251251556645014,
+     0.0013940230175241886
+    ],
+    "cohens_d": -0.2460035887115197,
+    "t_nadeau_bengio": -0.43715984909393407,
+    "p_raw": 0.668663233896146,
+    "n_folds": 15
+   },
+   "family": {
+    "a": "evo2_20b_blocks18",
+    "b": "6mer",
+    "r2_a": 0.8968732491748492,
+    "r2_b": 0.9494877862378281,
+    "delta": -0.05261453706297892,
+    "ci95": [
+     -0.09741112111732407,
+     -0.023547864059205618
+    ],
+    "cohens_d": -0.6695595130120892,
+    "t_nadeau_bengio": -1.1898384783769063,
+    "p_raw": 0.2538971262068018,
+    "n_folds": 15
+   }
+  },
+  "upa_oe": {
+   "cl95": {
+    "a": "evo2_20b_blocks18",
+    "b": "6mer",
+    "r2_a": 0.9043239387469387,
+    "r2_b": 0.9397427158519213,
+    "delta": -0.035418777104982535,
+    "ci95": [
+     -0.04115372779056264,
+     -0.030560456777424055
+    ],
+    "cohens_d": -3.238504420251092,
+    "t_nadeau_bengio": -5.754973376860782,
+    "p_raw": 4.980659458334759e-05,
+    "n_folds": 15
+   },
+   "family": {
+    "a": "evo2_20b_blocks18",
+    "b": "6mer",
+    "r2_a": 0.8106576388375699,
+    "r2_b": 0.9239585874911558,
+    "delta": -0.11330094865358586,
+    "ci95": [
+     -0.16052695859394292,
+     -0.0789504628089856
+    ],
+    "cohens_d": -1.3403985007147248,
+    "t_nadeau_bengio": -2.381950642945012,
+    "p_raw": 0.03195376420373004,
+    "n_folds": 15
+   }
+  }
+ },
+ "vs_best_baseline_by_class": {
+  "cl95": {
+   "coding_fraction": {
+    "compositional": {
+     "best": "kmer5",
+     "best_r2": 0.15309720425923573,
+     "delta": 0.22311364222642133,
+     "ci95": [
+      0.1954469456994609,
+      0.2518774413067334
+     ],
+     "p": 1.1307294171303955e-05,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.2229181300835674,
+     "delta": 0.15329271640208966,
+     "ci95": [
+      0.1215996996424772,
+      0.18414019528313924
+     ],
+     "p": 0.0007354646233026645,
+     "evo2_ahead": true
+    }
+   },
+   "gene_density": {
+    "compositional": {
+     "best": "dicodon",
+     "best_r2": 0.43331173349577234,
+     "delta": 0.34230620809258383,
+     "ci95": [
+      0.3094757187376539,
+      0.3762368587641248
+     ],
+     "p": 4.290183061479038e-07,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.5881106915664135,
+     "delta": 0.18750725002194268,
+     "ci95": [
+      0.16847069680735968,
+      0.20660886829009834
+     ],
+     "p": 6.602704795483256e-07,
+     "evo2_ahead": true
+    }
+   },
+   "noncoding_bp": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.5488797129004979,
+     "delta": 0.21744136988303264,
+     "ci95": [
+      0.1885020356096188,
+      0.24452534613152394
+     ],
+     "p": 9.459823418779764e-06,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.675133541169098,
+     "delta": 0.09118754161443254,
+     "ci95": [
+      0.06700313055197311,
+      0.1115195558774152
+     ],
+     "p": 0.0031592394571601542,
+     "evo2_ahead": true
+    }
+   },
+   "n_genes": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.7386477617812042,
+     "delta": 0.15652662577338028,
+     "ci95": [
+      0.14189141111078907,
+      0.1722330650955955
+     ],
+     "p": 4.429748891631284e-07,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.9004313750158859,
+     "delta": -0.005256987461301432,
+     "ci95": [
+      -0.014820164524909057,
+      0.005601767886673642
+     ],
+     "p": 0.6606911093582433,
+     "evo2_ahead": false
+    }
+   },
+   "mean_intergenic_len": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.23928852862753988,
+     "delta": 0.3149319003467643,
+     "ci95": [
+      0.29432898443229943,
+      0.33367392837808985
+     ],
+     "p": 1.6147810881600618e-09,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.33525483568832865,
+     "delta": 0.2189655932859756,
+     "ci95": [
+      0.20510309302859903,
+      0.23201491918691516
+     ],
+     "p": 1.17126169197776e-09,
+     "evo2_ahead": true
+    }
+   },
+   "overlap_bp": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.2851055037584563,
+     "delta": 0.3375068615182926,
+     "ci95": [
+      0.31904820928679806,
+      0.35751189653171667
+     ],
+     "p": 3.786286403766199e-10,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.3869555541154254,
+     "delta": 0.23565681116132348,
+     "ci95": [
+      0.21603161342032398,
+      0.2541278447562579
+     ],
+     "p": 4.018901690747746e-08,
+     "evo2_ahead": true
+    }
+   }
+  },
+  "family": {
+   "coding_fraction": {
+    "compositional": {
+     "best": "kmer4",
+     "best_r2": 0.007201086408004883,
+     "delta": 0.19930364654252591,
+     "ci95": [
+      0.12822371326954274,
+      0.2765659270659161
+     ],
+     "p": 0.03543088098355535,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.18193264617944524,
+     "delta": 0.02457208677108555,
+     "ci95": [
+      -0.02072396771055303,
+      0.06745050807430485
+     ],
+     "p": 0.6384386847841926,
+     "evo2_ahead": false
+    }
+   },
+   "gene_density": {
+    "compositional": {
+     "best": "kmer5",
+     "best_r2": 0.09574603426890507,
+     "delta": 0.4363067821218062,
+     "ci95": [
+      0.3720139437475301,
+      0.49958717073621955
+     ],
+     "p": 4.296326198096705e-05,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.5202422367116977,
+     "delta": 0.011810579679013555,
+     "ci95": [
+      -0.0405277721274692,
+      0.0590722345240174
+     ],
+     "p": 0.8384621821388426,
+     "evo2_ahead": false
+    }
+   },
+   "noncoding_bp": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.5390034649634704,
+     "delta": 0.06004693738263933,
+     "ci95": [
+      0.028081271857375863,
+      0.0893115427064756
+     ],
+     "p": 0.10879926157144972,
+     "evo2_ahead": false
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.6430848486605267,
+     "delta": -0.044034446314417,
+     "ci95": [
+      -0.08248378687754436,
+      -0.01069014008073448
+     ],
+     "p": 0.2996164348039225,
+     "evo2_ahead": false
+    }
+   },
+   "n_genes": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.7218064859314313,
+     "delta": 0.060524334880366015,
+     "ci95": [
+      0.01948226491222149,
+      0.10159541821186682
+     ],
+     "p": 0.21957951627988714,
+     "evo2_ahead": false
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.8908597686097579,
+     "delta": -0.10852894779796063,
+     "ci95": [
+      -0.14617944555137574,
+      -0.07572156039827233
+     ],
+     "p": 0.01817347985423746,
+     "evo2_ahead": false
+    }
+   },
+   "mean_intergenic_len": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.20551314550112076,
+     "delta": 0.12569599358424483,
+     "ci95": [
+      0.08132063182876371,
+      0.1694017513220776
+     ],
+     "p": 0.026942528067158352,
+     "evo2_ahead": true
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.2715190771013782,
+     "delta": 0.05969006198398741,
+     "ci95": [
+      0.0027133362335737907,
+      0.11163095246589386
+     ],
+     "p": 0.3606690993507048,
+     "evo2_ahead": false
+    }
+   },
+   "overlap_bp": {
+    "compositional": {
+     "best": "gc_len",
+     "best_r2": 0.24589616829823824,
+     "delta": 0.0917612732492008,
+     "ci95": [
+      0.026222436021558514,
+      0.15248371225206675
+     ],
+     "p": 0.22360888688046626,
+     "evo2_ahead": false
+    },
+    "annotation_like": {
+     "best": "orf",
+     "best_r2": 0.318005483962937,
+     "delta": 0.019651957584502056,
+     "ci95": [
+      -0.029940533174629535,
+      0.06401796526352872
+     ],
+     "p": 0.7189836245706038,
+     "evo2_ahead": false
+    }
+   }
+  }
+ }
+}

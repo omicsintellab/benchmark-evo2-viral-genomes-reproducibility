@@ -58,6 +58,23 @@ Run in order. Stages 2 and 4 need a GPU with the [Evo 2](https://github.com/ArcI
 | 3. Analysis | [`code/03_analysis/`](code/03_analysis) | Cluster-aware CV (`cluster_cv.py`), scale comparison (`scale_analysis.py`), dimensionality-matched PCA control (`pca_control.py`), FP8-vs-bf16 precision control (`precision_control.py`), extended features (`viral_features_extended.py`). Emits the JSONs in `results/json/`. | CPU (needs the cached embeddings) |
 | 4. Generation | [`code/04_generation/`](code/04_generation) | Teacher-forced perplexity and prompt→gap completion against a 4th-order Markov baseline. | GPU |
 | 5. Figures | [`code/05_figures/`](code/05_figures) | Plots and metric tables from the cached JSONs. | CPU |
+| 6. Revision R1 | [`code/06_revision_r1/`](code/06_revision_r1) | Two experiments added during peer review: a **block-shuffling control** for long-range genome arrangement, and a **re-run of generation that persists the generated sequences**, with a decoding sweep. Both write to `results/json/`. | GPU (single H100 80 GB; see `README-gpu.md`) |
+
+### Analyses added during peer review
+
+All of these run on CPU from the cached embeddings and emit JSON under `results/json/`, so
+every number in the revised manuscript and its supplementary tables regenerates without a GPU.
+
+| Question raised in review | Script | Cached result |
+|---|---|---|
+| Does the signal survive holding out whole families and genera? | `code/03_analysis/family_cv.py`, `within_family_cv.py` | `family_cv_metrics.json`, `within_family_cv_metrics.json` |
+| Do stronger compositional baselines close the gap? (k = 3–6, multi-k, codon, dicodon, six-frame ORF scan) | `code/03_analysis/composition_baselines.py` | `composition_baselines_metrics.json` |
+| Is the statistical treatment valid for repeated CV? | `code/03_analysis/final_statistics.py`, `ci_consistency.py` | `final_statistics.json`, `ci_consistency.json` |
+| Classification beyond accuracy (macro-F1, balanced accuracy, per-family recall) | `code/03_analysis/classification_metrics.py` | `classification_metrics.json` |
+| Does the eukaryote-vs-phage generation gap survive adjustment? | `code/03_analysis/generation_matched.py` | `generation_matched_metrics.json` |
+| How often was the gene→CDS fallback used, and does the gene-overlap definition matter? | `code/03_analysis/reextract_annotation.py`, `overlap_sensitivity.py` | `annotation_provenance.json`, `overlap_sensitivity.json` |
+| Do the embeddings encode long-range arrangement? | `code/03_analysis/block_shuffle_metrics.py` (from stage 6) | `block_shuffle_metrics_*.json` |
+| Supplementary tables | `code/05_figures/make_supp_tables_r1.py`, `make_supp_table_selection.py`, `make_family_cv_table.py`, `make_composition_table.py` | `results/tables/` |
 
 Model checkpoints are **not** redistributed here — obtain `evo2_20b` / `evo2_7b` from the [official Evo 2 release](https://github.com/ArcInstitute/evo2) and pass the path via `--weights-local`.
 

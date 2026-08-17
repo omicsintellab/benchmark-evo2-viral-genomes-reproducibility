@@ -1,0 +1,890 @@
+{
+ "note": "IC recomputado com a MESMA variancia do teste de Nadeau-Bengio. O IC bootstrap sobre diferencas por fold e anti-conservador porque trata folds de CV repetida como independentes.",
+ "correction_factor": "1/n + 1/(k-1), k=5",
+ "schemes": {
+  "cl95": {
+   "coding_fraction": {
+    "delta": 0.2951073653532446,
+    "cohens_d": 3.558634146103537,
+    "t_nadeau_bengio": 6.323858828398848,
+    "p_raw": 1.8786962350309656e-05,
+    "ci95_nb": [
+     0.19501937068241287,
+     0.39519536002407635
+    ],
+    "ci95_bootstrap": [
+     0.25518542648282716,
+     0.3347757978518721
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 1.8786962350309656e-05,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "gene_density": {
+    "delta": 0.37488088341643183,
+    "cohens_d": 6.855294060614255,
+    "t_nadeau_bengio": 12.182177230540276,
+    "p_raw": 7.706661876264207e-09,
+    "ci95_nb": [
+     0.3088795838876085,
+     0.44088218294525516
+    ],
+    "ci95_bootstrap": [
+     0.3497487966478732,
+     0.40272710172671206
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 2.7563966459780343e-08,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "noncoding_bp": {
+    "delta": 0.5117290783448598,
+    "cohens_d": 6.651673887574365,
+    "t_nadeau_bengio": 11.820334687572403,
+    "p_raw": 1.13489820727215e-08,
+    "ci95_nb": [
+     0.41887640165982576,
+     0.6045817550298939
+    ],
+    "ci95_bootstrap": [
+     0.47573198468186856,
+     0.5510447827445335
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 2.7563966459780343e-08,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "n_genes": {
+    "delta": 0.521007572802878,
+    "cohens_d": 8.370613870109025,
+    "t_nadeau_bengio": 14.874971196341322,
+    "p_raw": 5.685186329681996e-10,
+    "ci95_nb": [
+     0.4458847311044435,
+     0.5961304145013125
+    ],
+    "ci95_bootstrap": [
+     0.49247502198774984,
+     0.5522511236744374
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 2.842593164840998e-09,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "mean_intergenic_len": {
+    "delta": 0.4322007389565406,
+    "cohens_d": 6.915110457601412,
+    "t_nadeau_bengio": 12.28847375742108,
+    "p_raw": 6.890991614945086e-09,
+    "ci95_nb": [
+     0.3567659526909118,
+     0.5076355252221694
+    ],
+    "ci95_bootstrap": [
+     0.40126285552022783,
+     0.4625056088175568
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 2.7563966459780343e-08,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "overlap_bp": {
+    "delta": 0.40648062831438664,
+    "cohens_d": 12.446321373690171,
+    "t_nadeau_bengio": 22.11769349380313,
+    "p_raw": 2.736772243449418e-12,
+    "ci95_nb": [
+     0.36706357785435256,
+     0.4458976787744207
+    ],
+    "ci95_bootstrap": [
+     0.3909580502015869,
+     0.42215750451629397
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 1.6420633460696507e-11,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   }
+  },
+  "family": {
+   "coding_fraction": {
+    "delta": 0.3193885352095517,
+    "cohens_d": 1.8376639935736123,
+    "t_nadeau_bengio": 3.2656146128748635,
+    "p_raw": 0.005634905490062427,
+    "ci95_nb": [
+     0.10962089272963274,
+     0.5291561776894707
+    ],
+    "ci95_bootstrap": [
+     0.2331387551037423,
+     0.4029359981177775
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.01690471647018728,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "gene_density": {
+    "delta": 0.43782624060562103,
+    "cohens_d": 3.049650161973554,
+    "t_nadeau_bengio": 5.419370553008607,
+    "p_raw": 9.040325245059124e-05,
+    "ci95_nb": [
+     0.2645507866969873,
+     0.6111016945142548
+    ],
+    "ci95_bootstrap": [
+     0.36828068477339243,
+     0.5063340839965619
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.0005424195147035475,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "noncoding_bp": {
+    "delta": 0.7082627470109398,
+    "cohens_d": 2.383221562705851,
+    "t_nadeau_bengio": 4.235095854360243,
+    "p_raw": 0.000831854379364073,
+    "ci95_nb": [
+     0.34957605760045646,
+     1.0669494364214231
+    ],
+    "ci95_bootstrap": [
+     0.5768659455119243,
+     0.8595867682550173
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.0041592718968203645,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "n_genes": {
+    "delta": 0.6755993185219249,
+    "cohens_d": 1.751897250949791,
+    "t_nadeau_bengio": 3.113203111648043,
+    "p_raw": 0.007629636337139591,
+    "ci95_nb": [
+     0.21015701592686442,
+     1.1410416211169854
+    ],
+    "ci95_bootstrap": [
+     0.5073140538832438,
+     0.8761013381568664
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.01690471647018728,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "mean_intergenic_len": {
+    "delta": 0.5672696785211663,
+    "cohens_d": 2.100621767643737,
+    "t_nadeau_bengio": 3.7329028399802655,
+    "p_raw": 0.0022274485676669056,
+    "ci95_nb": [
+     0.24133768749255852,
+     0.893201669549774
+    ],
+    "ci95_bootstrap": [
+     0.4441286415807171,
+     0.7051928424665248
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.008909794270667622,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   },
+   "overlap_bp": {
+    "delta": 0.3871018954684463,
+    "cohens_d": 1.5226356520608106,
+    "t_nadeau_bengio": 2.705794559202615,
+    "p_raw": 0.0170619071391702,
+    "ci95_nb": [
+     0.08026005138076925,
+     0.6939437395561234
+    ],
+    "ci95_bootstrap": [
+     0.2733499847024837,
+     0.5168253752514935
+    ],
+    "n_folds": 15,
+    "se_ratio_nb_over_bootstrap": 2.179449471770337,
+    "p_holm": 0.0170619071391702,
+    "significant_holm": true,
+    "ci_nb_excludes_zero": true,
+    "ci_bootstrap_excludes_zero": true,
+    "disagreement": false
+   }
+  }
+ },
+ "vs_best_baseline_by_class": {
+  "cl95": {
+   "coding_fraction": {
+    "compositional": {
+     "delta": 0.22311364222642133,
+     "cohens_d": 3.7314410791548682,
+     "t_nadeau_bengio": 6.630944806984688,
+     "p_raw": 1.1307294171303955e-05,
+     "ci95_nb": [
+      0.15094727926170037,
+      0.2952800051911423
+     ],
+     "ci95_bootstrap": [
+      0.1954469456994609,
+      0.2518774413067334
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "kmer5",
+     "best_r2": 0.15309720425923573,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.1532927164020897,
+     "cohens_d": 2.418984504862083,
+     "t_nadeau_bengio": 4.298648270315065,
+     "p_raw": 0.0007354646233026645,
+     "ci95_nb": [
+      0.07680816665088867,
+      0.2297772661532907
+     ],
+     "ci95_bootstrap": [
+      0.1215996996424772,
+      0.18414019528313924
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.2229181300835674,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   },
+   "gene_density": {
+    "compositional": {
+     "delta": 0.34230620809258383,
+     "cohens_d": 4.966211646915932,
+     "t_nadeau_bengio": 8.82518968729436,
+     "p_raw": 4.290183061479038e-07,
+     "ci95_nb": [
+      0.2591154978277057,
+      0.42549691835746195
+     ],
+     "ci95_bootstrap": [
+      0.3094757187376539,
+      0.3762368587641248
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "dicodon",
+     "best_r2": 0.43331173349577234,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.18750725002194252,
+     "cohens_d": 4.790015227924107,
+     "t_nadeau_bengio": 8.512080434129421,
+     "p_raw": 6.602704795483256e-07,
+     "ci95_nb": [
+      0.14026109711642137,
+      0.23475340292746366
+     ],
+     "ci95_bootstrap": [
+      0.16847069680735968,
+      0.20660886829009834
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.5881106915664135,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   },
+   "noncoding_bp": {
+    "compositional": {
+     "delta": 0.21744136988303273,
+     "cohens_d": 3.7932246845859194,
+     "t_nadeau_bengio": 6.74073715500767,
+     "p_raw": 9.459823418779764e-06,
+     "ci95_nb": [
+      0.14825526385290988,
+      0.28662747591315557
+     ],
+     "ci95_bootstrap": [
+      0.1885020356096188,
+      0.24452534613152394
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.5488797129004979,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.0911875416144327,
+     "cohens_d": 2.001411443616288,
+     "t_nadeau_bengio": 3.55660146768094,
+     "p_raw": 0.0031592394571601542,
+     "ci95_nb": [
+      0.036197454269608145,
+      0.14617762895925723
+     ],
+     "ci95_bootstrap": [
+      0.06700313055197311,
+      0.1115195558774152
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.675133541169098,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   },
+   "n_genes": {
+    "compositional": {
+     "delta": 0.15652662577338017,
+     "cohens_d": 4.95297305954039,
+     "t_nadeau_bengio": 8.801664100169305,
+     "p_raw": 4.429748891631284e-07,
+     "ci95_nb": [
+      0.11838426775532734,
+      0.194668983791433
+     ],
+     "ci95_bootstrap": [
+      0.14189141111078907,
+      0.1722330650955955
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.7386477617812042,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": -0.005256987461301692,
+     "cohens_d": -0.25235672056582537,
+     "t_nadeau_bengio": -0.4484496606663946,
+     "p_raw": 0.6606911093582433,
+     "ci95_nb": [
+      -0.030399423088951154,
+      0.01988544816634777
+     ],
+     "ci95_bootstrap": [
+      -0.014820164524909057,
+      0.005601767886673642
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.9004313750158859,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": false,
+     "disagreement": false
+    }
+   },
+   "mean_intergenic_len": {
+    "compositional": {
+     "delta": 0.31493190034676427,
+     "cohens_d": 7.732148968532968,
+     "t_nadeau_bengio": 13.740389292529882,
+     "p_raw": 1.6147810881600618e-09,
+     "ci95_nb": [
+      0.2657730495250235,
+      0.36409075116850503
+     ],
+     "ci95_bootstrap": [
+      0.29432898443229943,
+      0.33367392837808985
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.23928852862753988,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.21896559328597556,
+     "cohens_d": 7.923822593107757,
+     "t_nadeau_bengio": 14.081002261768564,
+     "p_raw": 1.17126169197776e-09,
+     "ci95_nb": [
+      0.18561324514619146,
+      0.2523179414257597
+     ],
+     "ci95_bootstrap": [
+      0.20510309302859903,
+      0.23201491918691516
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.33525483568832865,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   },
+   "overlap_bp": {
+    "compositional": {
+     "delta": 0.33750686151829257,
+     "cohens_d": 8.631567757493915,
+     "t_nadeau_bengio": 15.33869842335926,
+     "p_raw": 3.786286403766199e-10,
+     "ci95_nb": [
+      0.29031379443493033,
+      0.3846999286016548
+     ],
+     "ci95_bootstrap": [
+      0.31904820928679806,
+      0.35751189653171667
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.2851055037584563,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.23565681116132337,
+     "cohens_d": 6.020802838089756,
+     "t_nadeau_bengio": 10.699247413053676,
+     "p_raw": 4.018901690747746e-08,
+     "ci95_nb": [
+      0.1884167042656643,
+      0.28289691805698247
+     ],
+     "ci95_bootstrap": [
+      0.21603161342032398,
+      0.2541278447562579
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.3869555541154254,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   }
+  },
+  "family": {
+   "coding_fraction": {
+    "compositional": {
+     "delta": 0.1993036465425259,
+     "cohens_d": 1.3099162777132707,
+     "t_nadeau_bengio": 2.3277823111854703,
+     "p_raw": 0.03543088098355535,
+     "ci95_nb": [
+      0.01566800075912983,
+      0.38293929232592194
+     ],
+     "ci95_bootstrap": [
+      0.12822371326954274,
+      0.2765659270659161
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "kmer4",
+     "best_r2": 0.007201086408004883,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.024572086771085525,
+     "cohens_d": 0.2702747113885185,
+     "t_nadeau_bengio": 0.4802907659329545,
+     "p_raw": 0.6384386847841926,
+     "ci95_nb": [
+      -0.08515703637495621,
+      0.13430120991712727
+     ],
+     "ci95_bootstrap": [
+      -0.02072396771055303,
+      0.06745050807430485
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.18193264617944524,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": false,
+     "disagreement": false
+    }
+   },
+   "gene_density": {
+    "compositional": {
+     "delta": 0.4363067821218062,
+     "cohens_d": 3.2861022865347183,
+     "t_nadeau_bengio": 5.839557004891283,
+     "p_raw": 4.296326198096705e-05,
+     "ci95_nb": [
+      0.27605747256649293,
+      0.5965560916771194
+     ],
+     "ci95_bootstrap": [
+      0.3720139437475301,
+      0.49958717073621955
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "kmer5",
+     "best_r2": 0.09574603426890507,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.011810579679013562,
+     "cohens_d": 0.11687346109567187,
+     "t_nadeau_bengio": 0.20768959055952654,
+     "p_raw": 0.8384621821388426,
+     "ci95_nb": [
+      -0.11015592814589459,
+      0.13377708750392173
+     ],
+     "ci95_bootstrap": [
+      -0.0405277721274692,
+      0.0590722345240174
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.5202422367116977,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": false,
+     "disagreement": false
+    }
+   },
+   "noncoding_bp": {
+    "compositional": {
+     "delta": 0.06004693738263925,
+     "cohens_d": 0.9638416753727753,
+     "t_nadeau_bengio": 1.7127916042335207,
+     "p_raw": 0.10879926157144972,
+     "ci95_nb": [
+      -0.01514485572875851,
+      0.135238730494037
+     ],
+     "ci95_bootstrap": [
+      0.028081271857375863,
+      0.0893115427064756
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.5390034649634704,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": true
+    },
+    "annotation_derived": {
+     "delta": -0.04403444631441702,
+     "cohens_d": -0.6061568635269065,
+     "t_nadeau_bengio": -1.0771690135684029,
+     "p_raw": 0.2996164348039225,
+     "ci95_nb": [
+      -0.1317128821729479,
+      0.04364398954411388
+     ],
+     "ci95_bootstrap": [
+      -0.08248378687754436,
+      -0.01069014008073448
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.6430848486605267,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": true
+    }
+   },
+   "n_genes": {
+    "compositional": {
+     "delta": 0.060524334880366105,
+     "cohens_d": 0.72321925569321,
+     "t_nadeau_bengio": 1.285194343450917,
+     "p_raw": 0.21957951627988714,
+     "ci95_nb": [
+      -0.04048123552844347,
+      0.16152990528917568
+     ],
+     "ci95_bootstrap": [
+      0.01948226491222149,
+      0.10159541821186682
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.7218064859314313,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": true
+    },
+    "annotation_derived": {
+     "delta": -0.10852894779796053,
+     "cohens_d": -1.5044883385591552,
+     "t_nadeau_bengio": -2.6735459368414713,
+     "p_raw": 0.01817347985423746,
+     "ci95_nb": [
+      -0.19559363566552462,
+      -0.021464259930396454
+     ],
+     "ci95_bootstrap": [
+      -0.14617944555137574,
+      -0.07572156039827233
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.8908597686097579,
+     "evo2_ahead": false,
+     "evo2_behind": true,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    }
+   },
+   "mean_intergenic_len": {
+    "compositional": {
+     "delta": 0.1256959935842449,
+     "cohens_d": 1.390399686965372,
+     "t_nadeau_bengio": 2.4708050826315944,
+     "p_raw": 0.026942528067158352,
+     "ci95_nb": [
+      0.016585365773472777,
+      0.23480662139501704
+     ],
+     "ci95_bootstrap": [
+      0.08132063182876371,
+      0.1694017513220776
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.20551314550112076,
+     "evo2_ahead": true,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": true,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": false
+    },
+    "annotation_derived": {
+     "delta": 0.05969006198398749,
+     "cohens_d": 0.5317979731474678,
+     "t_nadeau_bengio": 0.9450297977653874,
+     "p_raw": 0.3606690993507048,
+     "ci95_nb": [
+      -0.07577915882461964,
+      0.19515928279259462
+     ],
+     "ci95_bootstrap": [
+      0.0027133362335737907,
+      0.11163095246589386
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.2715190771013782,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": true
+    }
+   },
+   "overlap_bp": {
+    "compositional": {
+     "delta": 0.09176127324920076,
+     "cohens_d": 0.7165901285646041,
+     "t_nadeau_bengio": 1.273414075405461,
+     "p_raw": 0.22360888688046626,
+     "ci95_nb": [
+      -0.06279046379558471,
+      0.24631301029398622
+     ],
+     "ci95_bootstrap": [
+      0.026222436021558514,
+      0.15248371225206675
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "gc_len",
+     "best_r2": 0.24589616829823824,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": true,
+     "disagreement": true
+    },
+    "annotation_derived": {
+     "delta": 0.01965195758450202,
+     "cohens_d": 0.20661749031733787,
+     "t_nadeau_bengio": 0.36716891554462566,
+     "p_raw": 0.7189836245706038,
+     "ci95_nb": [
+      -0.09514331847046462,
+      0.13444723363946864
+     ],
+     "ci95_bootstrap": [
+      -0.029940533174629535,
+      0.06401796526352872
+     ],
+     "n_folds": 15,
+     "se_ratio_nb_over_bootstrap": 2.179449471770337,
+     "best": "orf",
+     "best_r2": 0.318005483962937,
+     "evo2_ahead": false,
+     "evo2_behind": false,
+     "ci_nb_excludes_zero": false,
+     "ci_bootstrap_excludes_zero": false,
+     "disagreement": false
+    }
+   }
+  }
+ },
+ "n_disagreements_by_class": 5,
+ "scoreboard": {
+  "cl95": {
+   "compositional": {
+    "n_targets": 6,
+    "evo2_ahead": [
+     "coding_fraction",
+     "gene_density",
+     "noncoding_bp",
+     "n_genes",
+     "mean_intergenic_len",
+     "overlap_bp"
+    ],
+    "evo2_behind": []
+   },
+   "annotation_derived": {
+    "n_targets": 6,
+    "evo2_ahead": [
+     "coding_fraction",
+     "gene_density",
+     "noncoding_bp",
+     "mean_intergenic_len",
+     "overlap_bp"
+    ],
+    "evo2_behind": []
+   }
+  },
+  "family": {
+   "compositional": {
+    "n_targets": 6,
+    "evo2_ahead": [
+     "coding_fraction",
+     "gene_density",
+     "mean_intergenic_len"
+    ],
+    "evo2_behind": []
+   },
+   "annotation_derived": {
+    "n_targets": 6,
+    "evo2_ahead": [],
+    "evo2_behind": [
+     "n_genes"
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,183 @@
+{
+ "n_genomes": 182,
+ "conditions": [
+  "shuf2",
+  "shuf4",
+  "shuf8",
+  "shuf16"
+ ],
+ "npz": "block_shuffle_evo2_20b_L18_w32768.npz",
+ "between_genome_cosine": {
+  "median": 0.7633636645016132,
+  "p5": 0.29992221515540507,
+  "p95": 1.2026144175384812
+ },
+ "displacement": {
+  "shuf2": {
+   "n_blocks": 2,
+   "cosine_median": 0.0357814782742823,
+   "cosine_iqr": [
+    0.011119671406195825,
+    0.09618460365411569
+   ],
+   "frac_between_genome_median": 0.04687343652601463,
+   "frac_between_genome_iqr": [
+    0.01456667630814687,
+    0.12600102431769913
+   ]
+  },
+  "shuf4": {
+   "n_blocks": 4,
+   "cosine_median": 0.026267416289580015,
+   "cosine_iqr": [
+    0.006602751652822342,
+    0.06822647067898885
+   ],
+   "frac_between_genome_median": 0.03441009509763548,
+   "frac_between_genome_iqr": [
+    0.008649549303781917,
+    0.0893761045379763
+   ]
+  },
+  "shuf8": {
+   "n_blocks": 8,
+   "cosine_median": 0.03352589453695104,
+   "cosine_iqr": [
+    0.009001403109425155,
+    0.09470702769739786
+   ],
+   "frac_between_genome_median": 0.04391864074227257,
+   "frac_between_genome_iqr": [
+    0.01179176260020447,
+    0.12406541220327853
+   ]
+  },
+  "shuf16": {
+   "n_blocks": 16,
+   "cosine_median": 0.05174130677747002,
+   "cosine_iqr": [
+    0.010926743096709213,
+    0.15674877304143964
+   ],
+   "frac_between_genome_median": 0.06778067804845153,
+   "frac_between_genome_iqr": [
+    0.01431394184034564,
+    0.2053395784089071
+   ]
+  }
+ },
+ "dose_response": {
+  "spearman_rho_median": 0.39999999999999997,
+  "spearman_rho_iqr": [
+   0.0,
+   0.7999999999999999
+  ],
+  "n_genomes_evaluated": 182,
+  "wilcoxon_p_rho_ne_0": 8.988339530558716e-11,
+  "note": "rho por genoma entre n_blocks e deslocamento; Wilcoxon dos rhos contra 0"
+ },
+ "probe_transfer": {
+  "coding_fraction": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": 0.053767257810658164,
+    "shuf2": 0.046101113256462156,
+    "shuf4": 0.04758060045178136,
+    "shuf8": 0.003914127630796904,
+    "shuf16": -0.1355131980741553
+   },
+   "retention": {
+    "shuf2": 0.8574198338105247,
+    "shuf4": 0.8849363421012996,
+    "shuf8": 0.0727976056465542,
+    "shuf16": -2.520366550054796
+   }
+  },
+  "gene_density": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": 0.5011717304755818,
+    "shuf2": 0.4866349102197167,
+    "shuf4": 0.476388918377607,
+    "shuf8": 0.4582498061382241,
+    "shuf16": 0.39737901593296054
+   },
+   "retention": {
+    "shuf2": 0.9709943331359282,
+    "shuf4": 0.9505502593403314,
+    "shuf8": 0.9143568526967245,
+    "shuf16": 0.792899901907619
+   }
+  },
+  "noncoding_bp": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": -0.011833680315408213,
+    "shuf2": -0.004811238651550198,
+    "shuf4": -0.011504374154041708,
+    "shuf8": -0.0029581792235477966,
+    "shuf16": -0.008377432511777583
+   },
+   "retention": {
+    "shuf2": null,
+    "shuf4": null,
+    "shuf8": null,
+    "shuf16": null
+   }
+  },
+  "n_genes": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": 0.654945488931485,
+    "shuf2": 0.6556311508866456,
+    "shuf4": 0.6502876968813804,
+    "shuf8": 0.6557683198117192,
+    "shuf16": 0.6470492494033593
+   },
+   "retention": {
+    "shuf2": 1.001046899271387,
+    "shuf4": 0.9928882752399691,
+    "shuf8": 1.0012563349074695,
+    "shuf16": 0.9879436691120538
+   }
+  },
+  "mean_intergenic_len": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": -0.054854528329520535,
+    "shuf2": -0.08507116779789858,
+    "shuf4": -0.06130786868768201,
+    "shuf8": -0.09030339353978012,
+    "shuf16": -0.07801640718341263
+   },
+   "retention": {
+    "shuf2": null,
+    "shuf4": null,
+    "shuf8": null,
+    "shuf16": null
+   }
+  },
+  "overlap_bp": {
+   "n": 182,
+   "n_groups": 74,
+   "r2": {
+    "original": -0.3381792287620775,
+    "shuf2": -0.31578128272637196,
+    "shuf4": -0.3198595258771435,
+    "shuf8": -0.3199011964214362,
+    "shuf16": -0.32015717730463256
+   },
+   "retention": {
+    "shuf2": null,
+    "shuf4": null,
+    "shuf8": null,
+    "shuf16": null
+   }
+  }
+ }
+}
