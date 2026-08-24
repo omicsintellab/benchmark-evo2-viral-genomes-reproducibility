@@ -79,7 +79,7 @@
   "T0.7_K4": {
    "euk_heldout": {
     "kmer4_cosine": {
-     "mean": 0.6552939892084002,
+     "mean": 0.6552939892084001,
      "sd": 0.1920679863535954,
      "n": 300
     },
@@ -116,7 +116,7 @@
    "phage_seen": {
     "kmer4_cosine": {
      "mean": 0.7971725755412932,
-     "sd": 0.13970412522637654,
+     "sd": 0.1397041252263765,
      "n": 300
     },
     "identity": {
@@ -227,8 +227,8 @@
   "T1.0_K4": {
    "euk_heldout": {
     "kmer4_cosine": {
-     "mean": 0.8029547894578458,
-     "sd": 0.057875312675445684,
+     "mean": 0.8029547894578459,
+     "sd": 0.0578753126754457,
      "n": 300
     },
     "identity": {
@@ -263,8 +263,8 @@
    },
    "phage_seen": {
     "kmer4_cosine": {
-     "mean": 0.8439901914118058,
-     "sd": 0.05409840469580598,
+     "mean": 0.8439901914118056,
+     "sd": 0.05409840469580604,
      "n": 300
     },
     "identity": {
@@ -301,11 +301,33 @@
  },
  "sanity": {
   "positive_control": {
-   "n_matched": 2400,
-   "kmer4_cosine_new_mean": 0.6151259072747053,
+   "ref_temperature": 0.7,
+   "ref_top_k": 4,
+   "n_matched": 600,
+   "kmer4_cosine_new_mean": 0.7262332823748466,
    "kmer4_cosine_original_mean": 0.749595476503578,
-   "delta": -0.13446956922887277,
-   "pearson_r": 0.30689512332364716
+   "delta": -0.023362194128731417,
+   "pearson_r": 0.45650055308041126
+  },
+  "other_configs_not_a_control": {
+   "note": "A corrida original usou uma \u00fanica configura\u00e7\u00e3o de decodifica\u00e7\u00e3o. Estes deltas medem o EFEITO DA DECODIFICA\u00c7\u00c3O, n\u00e3o a integridade do pipeline, e n\u00e3o devem ser lidos como controle positivo.",
+   "by_config": {
+    "T0.7_K1": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.4553989281445742,
+     "delta_vs_original_run": -0.29419654835900383
+    },
+    "T1.0_K1": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.4553989281445742,
+     "delta_vs_original_run": -0.29419654835900383
+    },
+    "T1.0_K4": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.8234724904348257,
+     "delta_vs_original_run": 0.07387701393124768
+    }
+   }
   },
   "degenerate_check": {
    "median_max_homopolymer": 5.0,

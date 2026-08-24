@@ -1,0 +1,118 @@
+{
+ "source": "codon_enc_cds.parquet (S3), destilado — o parquet nao e versionado",
+ "n_records": 1200,
+ "feature_subset_n": 1200,
+ "coverage_note": "1200/1200 records do subconjunto de features",
+ "scale_note": "ENC vai de 20 (uso de codons maximamente enviesado) a 61 (uniforme)",
+ "overall": {
+  "n": 1200,
+  "median": 50.9,
+  "iqr": [
+   46.5,
+   54.6
+  ],
+  "range": [
+   28.3,
+   61.0
+  ]
+ },
+ "by_baltimore": {
+  "?": {
+   "n": 240,
+   "median": 49.7,
+   "iqr": [
+    47.1,
+    53.4
+   ],
+   "range": [
+    30.5,
+    61.0
+   ]
+  },
+  "I": {
+   "n": 325,
+   "median": 47.9,
+   "iqr": [
+    42.7,
+    52.5
+   ],
+   "range": [
+    28.3,
+    59.6
+   ]
+  },
+  "II": {
+   "n": 139,
+   "median": 54.1,
+   "iqr": [
+    48.9,
+    57.5
+   ],
+   "range": [
+    33.3,
+    61.0
+   ]
+  },
+  "III": {
+   "n": 121,
+   "median": 52.0,
+   "iqr": [
+    47.8,
+    55.3
+   ],
+   "range": [
+    37.9,
+    59.4
+   ]
+  },
+  "IV": {
+   "n": 135,
+   "median": 54.1,
+   "iqr": [
+    50.7,
+    57.1
+   ],
+   "range": [
+    36.9,
+    60.2
+   ]
+  },
+  "V": {
+   "n": 120,
+   "median": 50.4,
+   "iqr": [
+    46.7,
+    53.2
+   ],
+   "range": [
+    33.4,
+    61.0
+   ]
+  },
+  "VI": {
+   "n": 47,
+   "median": 51.1,
+   "iqr": [
+    45.4,
+    54.6
+   ],
+   "range": [
+    37.3,
+    59.0
+   ]
+  },
+  "VII": {
+   "n": 73,
+   "median": 52.5,
+   "iqr": [
+    48.7,
+    54.3
+   ],
+   "range": [
+    31.0,
+    61.0
+   ]
+  }
+ },
+ "median_codons_per_record": 2103
+}

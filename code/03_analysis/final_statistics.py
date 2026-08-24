@@ -67,7 +67,9 @@ def main():
         "contrast": f"{EVO} vs {KMER}",
         "test": "t reamostrado corrigido (Nadeau & Bengio, 2003), fator (1/n + 1/(k-1))",
         "correction": "Holm dentro do conjunto primario de 6",
-        "ci": "bootstrap de 10.000 reamostragens sobre as diferencas por fold",
+        "ci": "IC obtido invertendo a MESMA estatistica corrigida do teste "
+               "(ver ci_consistency.json); o bootstrap sobre diferencas por fold trata os "
+               "folds como independentes e foi abandonado",
         "negative_control": [n for n, _ in NEGCTRL],
         "negative_control_note":
             "Alvos de composicao de dinucleotideo, declarados ANTES como casos em que se "

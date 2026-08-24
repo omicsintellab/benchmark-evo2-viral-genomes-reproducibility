@@ -73,7 +73,7 @@ def main():
         ("Union of both subsets", f"{n_u:,}", "—",
          f"layer sweep, scale and precision controls; intersection of the two subsets = {n_i}"),
         ("Family-grouped analyses", f"{n_fam:,}", f"−{n_nofam} without an assigned family",
-         "GroupKFold by family and genus, leave-one-family-out, within-family CV"),
+         "GroupKFold by family, leave-one-family-out, within-family CV"),
     ]
 
     out = []
