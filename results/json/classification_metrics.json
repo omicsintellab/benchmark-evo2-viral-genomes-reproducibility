@@ -1,0 +1,364 @@
+{
+ "config": {
+  "splits": 5,
+  "repeats": 3,
+  "seed": 42,
+  "min_family_n": 25,
+  "note_family_scheme": "Familia nao e avaliada sob agrupamento por familia: nao se preve uma classe ausente do treino. So o esquema pre-registrado cl95."
+ },
+ "targets": {
+  "baltimore": {
+   "n": 981,
+   "reps": {
+    "evo2_20b_blocks18": {
+     "cl95": {
+      "n_classes": 7,
+      "n_obs": 2943,
+      "accuracy": 0.9616038056405029,
+      "balanced_accuracy": 0.9632499870580319,
+      "macro_f1": 0.9633681965779192,
+      "weighted_f1": 0.9615936117848835,
+      "per_class_recall": {
+       "I": {
+        "recall": 0.96,
+        "n": 450
+       },
+       "II": {
+        "recall": 0.9777777777777777,
+        "n": 450
+       },
+       "III": {
+        "recall": 0.94,
+        "n": 450
+       },
+       "IV": {
+        "recall": 0.9377777777777778,
+        "n": 450
+       },
+       "V": {
+        "recall": 0.9511111111111111,
+        "n": 450
+       },
+       "VI": {
+        "recall": 0.9858156028368794,
+        "n": 282
+       },
+       "VII": {
+        "recall": 0.9902676399026764,
+        "n": 411
+       }
+      }
+     },
+     "family": {
+      "n_classes": 7,
+      "n_obs": 2943,
+      "accuracy": 0.6710839279646619,
+      "balanced_accuracy": 0.6275515028706519,
+      "macro_f1": 0.5968189299688732,
+      "weighted_f1": 0.6382842838484616,
+      "per_class_recall": {
+       "I": {
+        "recall": 0.8822222222222222,
+        "n": 450
+       },
+       "II": {
+        "recall": 0.8777777777777778,
+        "n": 450
+       },
+       "III": {
+        "recall": 0.88,
+        "n": 450
+       },
+       "IV": {
+        "recall": 0.88,
+        "n": 450
+       },
+       "V": {
+        "recall": 0.8622222222222222,
+        "n": 450
+       },
+       "VI": {
+        "recall": 0.010638297872340425,
+        "n": 282
+       },
+       "VII": {
+        "recall": 0.0,
+        "n": 411
+       }
+      }
+     }
+    },
+    "6mer": {
+     "cl95": {
+      "n_classes": 7,
+      "n_obs": 2943,
+      "accuracy": 0.8137954468229698,
+      "balanced_accuracy": 0.8224551283473477,
+      "macro_f1": 0.8187373608559945,
+      "weighted_f1": 0.810999212189295,
+      "per_class_recall": {
+       "I": {
+        "recall": 0.9355555555555556,
+        "n": 450
+       },
+       "II": {
+        "recall": 0.6377777777777778,
+        "n": 450
+       },
+       "III": {
+        "recall": 0.6155555555555555,
+        "n": 450
+       },
+       "IV": {
+        "recall": 0.7866666666666666,
+        "n": 450
+       },
+       "V": {
+        "recall": 0.8711111111111111,
+        "n": 450
+       },
+       "VI": {
+        "recall": 0.9397163120567376,
+        "n": 282
+       },
+       "VII": {
+        "recall": 0.9708029197080292,
+        "n": 411
+       }
+      }
+     },
+     "family": {
+      "n_classes": 7,
+      "n_obs": 2943,
+      "accuracy": 0.43900781515460413,
+      "balanced_accuracy": 0.41018885413046,
+      "macro_f1": 0.36246533616018295,
+      "weighted_f1": 0.387915145883314,
+      "per_class_recall": {
+       "I": {
+        "recall": 0.8644444444444445,
+        "n": 450
+       },
+       "II": {
+        "recall": 0.17333333333333334,
+        "n": 450
+       },
+       "III": {
+        "recall": 0.39111111111111113,
+        "n": 450
+       },
+       "IV": {
+        "recall": 0.6955555555555556,
+        "n": 450
+       },
+       "V": {
+        "recall": 0.7444444444444445,
+        "n": 450
+       },
+       "VI": {
+        "recall": 0.0,
+        "n": 282
+       },
+       "VII": {
+        "recall": 0.0024330900243309003,
+        "n": 411
+       }
+      }
+     }
+    }
+   }
+  },
+  "host": {
+   "n": 1080,
+   "reps": {
+    "evo2_20b_blocks18": {
+     "cl95": {
+      "n_classes": 3,
+      "n_obs": 3240,
+      "accuracy": 0.9925925925925926,
+      "balanced_accuracy": 0.9920634920634921,
+      "macro_f1": 0.9863721566335754,
+      "weighted_f1": 0.9926713158927839,
+      "per_class_recall": {
+       "archaea": {
+        "recall": 0.9916666666666667,
+        "n": 360
+       },
+       "bacteria": {
+        "recall": 0.9916666666666667,
+        "n": 360
+       },
+       "eukaryote": {
+        "recall": 0.9928571428571429,
+        "n": 2520
+       }
+      }
+     },
+     "family": {
+      "n_classes": 3,
+      "n_obs": 3240,
+      "accuracy": 0.9481481481481482,
+      "balanced_accuracy": 0.9436507936507935,
+      "macro_f1": 0.9150485679554544,
+      "weighted_f1": 0.9494830578014986,
+      "per_class_recall": {
+       "archaea": {
+        "recall": 0.9916666666666667,
+        "n": 360
+       },
+       "bacteria": {
+        "recall": 0.8888888888888888,
+        "n": 360
+       },
+       "eukaryote": {
+        "recall": 0.9503968253968254,
+        "n": 2520
+       }
+      }
+     }
+    },
+    "6mer": {
+     "cl95": {
+      "n_classes": 3,
+      "n_obs": 3240,
+      "accuracy": 0.9287037037037037,
+      "balanced_accuracy": 0.917063492063492,
+      "macro_f1": 0.8797126324613309,
+      "weighted_f1": 0.9311895961651544,
+      "per_class_recall": {
+       "archaea": {
+        "recall": 0.9388888888888889,
+        "n": 360
+       },
+       "bacteria": {
+        "recall": 0.8777777777777778,
+        "n": 360
+       },
+       "eukaryote": {
+        "recall": 0.9345238095238095,
+        "n": 2520
+       }
+      }
+     },
+     "family": {
+      "n_classes": 3,
+      "n_obs": 3240,
+      "accuracy": 0.8848765432098765,
+      "balanced_accuracy": 0.8514550264550264,
+      "macro_f1": 0.811140831884486,
+      "weighted_f1": 0.8906368975514489,
+      "per_class_recall": {
+       "archaea": {
+        "recall": 0.8388888888888889,
+        "n": 360
+       },
+       "bacteria": {
+        "recall": 0.8138888888888889,
+        "n": 360
+       },
+       "eukaryote": {
+        "recall": 0.9015873015873016,
+        "n": 2520
+       }
+      }
+     }
+    }
+   }
+  },
+  "family": {
+   "n": 349,
+   "reps": {
+    "evo2_20b_blocks18": {
+     "cl95": {
+      "n_classes": 8,
+      "n_obs": 1047,
+      "accuracy": 0.9063992359121299,
+      "balanced_accuracy": 0.8921604279135865,
+      "macro_f1": 0.8926520415372909,
+      "weighted_f1": 0.9057315001643754,
+      "per_class_recall": {
+       "Caulimoviridae": {
+        "recall": 0.9761904761904762,
+        "n": 168
+       },
+       "Geminiviridae": {
+        "recall": 1.0,
+        "n": 108
+       },
+       "Papillomaviridae": {
+        "recall": 1.0,
+        "n": 78
+       },
+       "Peribunyaviridae": {
+        "recall": 0.8148148148148148,
+        "n": 81
+       },
+       "Phenuiviridae": {
+        "recall": 0.9598393574297188,
+        "n": 249
+       },
+       "Retroviridae": {
+        "recall": 0.9782608695652174,
+        "n": 138
+       },
+       "Sedoreoviridae": {
+        "recall": 0.7317073170731707,
+        "n": 123
+       },
+       "Spinareoviridae": {
+        "recall": 0.6764705882352942,
+        "n": 102
+       }
+      }
+     }
+    },
+    "6mer": {
+     "cl95": {
+      "n_classes": 8,
+      "n_obs": 1047,
+      "accuracy": 0.8987583572110793,
+      "balanced_accuracy": 0.8829298032572166,
+      "macro_f1": 0.8850771030882806,
+      "weighted_f1": 0.8958772528748178,
+      "per_class_recall": {
+       "Caulimoviridae": {
+        "recall": 0.9702380952380952,
+        "n": 168
+       },
+       "Geminiviridae": {
+        "recall": 1.0,
+        "n": 108
+       },
+       "Papillomaviridae": {
+        "recall": 0.9615384615384616,
+        "n": 78
+       },
+       "Peribunyaviridae": {
+        "recall": 0.8765432098765432,
+        "n": 81
+       },
+       "Phenuiviridae": {
+        "recall": 0.9839357429718876,
+        "n": 249
+       },
+       "Retroviridae": {
+        "recall": 0.9782608695652174,
+        "n": 138
+       },
+       "Sedoreoviridae": {
+        "recall": 0.5772357723577236,
+        "n": 123
+       },
+       "Spinareoviridae": {
+        "recall": 0.7156862745098039,
+        "n": 102
+       }
+      }
+     }
+    }
+   },
+   "families_included": 8,
+   "families_excluded_below_min": 176
+  }
+ }
+}

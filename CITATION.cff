@@ -32,8 +32,8 @@ license: MIT
 preferred-citation:
   type: article
   title: >-
-    Genomic foundation model embeddings encode higher-order viral genome architecture
-    beyond sequence composition: a benchmark of Evo 2
+    Decoding taxonomy and genome-level architecture from Evo 2 embeddings of viral
+    genomes: a linear-probe benchmark against compositional baselines
   authors:
     - family-names: Amgarten
       given-names: Deyvid
@@ -47,7 +47,13 @@ preferred-citation:
       given-names: João Renato Rebello
   journal: "Frontiers in Bioinformatics"
   year: 2026
-  notes: "Brief Research Report, submitted. DOI to be added on acceptance."
+  notes: >-
+    Brief Research Report. Submitted 2026-07-14; revised version submitted 2026-08-23
+    after a major-revision decision. Journal DOI to be added on acceptance.
+  identifiers:
+    - type: doi
+      value: 10.64898/2026.07.14.738542
+      description: bioRxiv preprint
 references:
   - type: article
     title: "Genome modeling and design across all domains of life with Evo 2"

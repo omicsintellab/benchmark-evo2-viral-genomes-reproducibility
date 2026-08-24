@@ -1,0 +1,340 @@
+{
+ "n_sequences": 2400,
+ "edit_distance_engine": "biopython",
+ "by_config": {
+  "T0.7_K1": {
+   "euk_heldout": {
+    "kmer4_cosine": {
+     "mean": 0.3371959221130223,
+     "sd": 0.2037358933810666,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.45025390625,
+     "sd": 0.06435994720879226,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 562.94,
+     "sd": 65.90458594180329,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.31951171875,
+     "sd": 0.21118373690029396,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.06627565982404691,
+     "sd": 0.18528821621998973,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 327.09,
+     "sd": 57.65833427793146,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.0463049853372434,
+     "longest_orf_codons_true": 274.27
+    }
+   },
+   "phage_seen": {
+    "kmer4_cosine": {
+     "mean": 0.573601934176126,
+     "sd": 0.2885888163384229,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.56658203125,
+     "sd": 0.14945330684610594,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 443.82,
+     "sd": 153.04018621041246,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.5033984375,
+     "sd": 0.2103291507974591,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.0382991202346041,
+     "sd": 0.05774287843081063,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 273.09,
+     "sd": 100.67993875092313,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.04129032258064516,
+     "longest_orf_codons_true": 206.61
+    }
+   }
+  },
+  "T0.7_K4": {
+   "euk_heldout": {
+    "kmer4_cosine": {
+     "mean": 0.6552939892084001,
+     "sd": 0.1920679863535954,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.48483723958333336,
+     "sd": 0.04215312495890242,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 527.5266666666666,
+     "sd": 43.16479995791608,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.3937076822916667,
+     "sd": 0.1365963757247953,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.05231671554252199,
+     "sd": 0.06594524858033025,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 286.1533333333333,
+     "sd": 86.12060740004138,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.0463049853372434,
+     "longest_orf_codons_true": 274.27
+    }
+   },
+   "phage_seen": {
+    "kmer4_cosine": {
+     "mean": 0.7971725755412932,
+     "sd": 0.1397041252263765,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.564736328125,
+     "sd": 0.1345394802752551,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 445.71,
+     "sd": 137.76842780186124,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.5021842447916667,
+     "sd": 0.16826200770030109,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.0433822091886608,
+     "sd": 0.04682361849072078,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 223.68333333333334,
+     "sd": 95.80992395004426,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.04129032258064516,
+     "longest_orf_codons_true": 206.61
+    }
+   }
+  },
+  "T1.0_K1": {
+   "euk_heldout": {
+    "kmer4_cosine": {
+     "mean": 0.3371959221130223,
+     "sd": 0.2037358933810666,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.45025390625,
+     "sd": 0.06435994720879226,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 562.94,
+     "sd": 65.90458594180329,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.31951171875,
+     "sd": 0.21118373690029396,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.06627565982404691,
+     "sd": 0.18528821621998973,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 327.09,
+     "sd": 57.65833427793146,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.0463049853372434,
+     "longest_orf_codons_true": 274.27
+    }
+   },
+   "phage_seen": {
+    "kmer4_cosine": {
+     "mean": 0.573601934176126,
+     "sd": 0.2885888163384229,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.56658203125,
+     "sd": 0.14945330684610594,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 443.82,
+     "sd": 153.04018621041246,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.5033984375,
+     "sd": 0.2103291507974591,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.0382991202346041,
+     "sd": 0.05774287843081063,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 273.09,
+     "sd": 100.67993875092313,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.04129032258064516,
+     "longest_orf_codons_true": 206.61
+    }
+   }
+  },
+  "T1.0_K4": {
+   "euk_heldout": {
+    "kmer4_cosine": {
+     "mean": 0.8029547894578459,
+     "sd": 0.0578753126754457,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.48620442708333333,
+     "sd": 0.02221952437571484,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 526.1266666666667,
+     "sd": 22.752792960731995,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.43069661458333336,
+     "sd": 0.07443463577080589,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.04655913978494623,
+     "sd": 0.0323877298755105,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 245.54,
+     "sd": 100.77821803727842,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.0463049853372434,
+     "longest_orf_codons_true": 274.27
+    }
+   },
+   "phage_seen": {
+    "kmer4_cosine": {
+     "mean": 0.8439901914118056,
+     "sd": 0.05409840469580604,
+     "n": 300
+    },
+    "identity": {
+     "mean": 0.536962890625,
+     "sd": 0.10063436631592652,
+     "n": 300
+    },
+    "edit_distance": {
+     "mean": 474.15,
+     "sd": 103.04959110750876,
+     "n": 300
+    },
+    "gc": {
+     "mean": 0.49737630208333333,
+     "sd": 0.12986721223348668,
+     "n": 300
+    },
+    "stop_density_frame0_gen": {
+     "mean": 0.04280547409579667,
+     "sd": 0.030779384858847892,
+     "n": 300
+    },
+    "longest_orf_codons_gen": {
+     "mean": 195.26333333333332,
+     "sd": 86.22309471615087,
+     "n": 300
+    },
+    "true_reference": {
+     "stop_density_frame0_true": 0.04129032258064516,
+     "longest_orf_codons_true": 206.61
+    }
+   }
+  }
+ },
+ "sanity": {
+  "positive_control": {
+   "ref_temperature": 0.7,
+   "ref_top_k": 4,
+   "n_matched": 600,
+   "kmer4_cosine_new_mean": 0.7262332823748466,
+   "kmer4_cosine_original_mean": 0.749595476503578,
+   "delta": -0.023362194128731417,
+   "pearson_r": 0.45650055308041126
+  },
+  "other_configs_not_a_control": {
+   "note": "A corrida original usou uma \u00fanica configura\u00e7\u00e3o de decodifica\u00e7\u00e3o. Estes deltas medem o EFEITO DA DECODIFICA\u00c7\u00c3O, n\u00e3o a integridade do pipeline, e n\u00e3o devem ser lidos como controle positivo.",
+   "by_config": {
+    "T0.7_K1": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.4553989281445742,
+     "delta_vs_original_run": -0.29419654835900383
+    },
+    "T1.0_K1": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.4553989281445742,
+     "delta_vs_original_run": -0.29419654835900383
+    },
+    "T1.0_K4": {
+     "n": 600,
+     "kmer4_cosine_new_mean": 0.8234724904348257,
+     "delta_vs_original_run": 0.07387701393124768
+    }
+   }
+  },
+  "degenerate_check": {
+   "median_max_homopolymer": 5.0,
+   "max_max_homopolymer": 1024,
+   "min_frac_acgt": 1.0,
+   "median_gc": 0.416015625,
+   "n_len_mismatch": 0
+  }
+ }
+}

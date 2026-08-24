@@ -1,0 +1,41 @@
+{
+ "n_records_parsed": 19433,
+ "scopes": {
+  "all_parsed": {
+   "n": 19433,
+   "gene_fallback": {
+    "n_used": 457,
+    "pct": 2.3516698399629496,
+    "note": "records sem NENHUMA feature `gene`, em que n_genes caiu para n_CDS"
+   },
+   "overlap_definition": {
+    "n_differs_from_published": 1068,
+    "pct_differs": 5.495806103020635,
+    "mean_published": 1148.4777955024958,
+    "mean_positions": 1071.380744095096,
+    "mean_ratio_published_over_positions": 1.0269276550538369,
+    "mean_same_strand": 774.5315700097772,
+    "mean_opposite_strand": 326.7234086347965,
+    "pct_of_overlap_that_is_opposite_strand": 30.495546091856625
+   }
+  },
+  "analysed_subset": {
+   "n": 1912,
+   "gene_fallback": {
+    "n_used": 45,
+    "pct": 2.3535564853556483,
+    "note": "records sem NENHUMA feature `gene`, em que n_genes caiu para n_CDS"
+   },
+   "overlap_definition": {
+    "n_differs_from_published": 151,
+    "pct_differs": 7.897489539748954,
+    "mean_published": 1058.6276150627616,
+    "mean_positions": 949.364539748954,
+    "mean_ratio_published_over_positions": 1.054180940242206,
+    "mean_same_strand": 721.7808577405858,
+    "mean_opposite_strand": 248.73483263598325,
+    "pct_of_overlap_that_is_opposite_strand": 26.200139379732644
+   }
+  }
+ }
+}
