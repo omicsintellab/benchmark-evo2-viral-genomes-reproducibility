@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""make_composition_table.py — tabelas dos baselines composicionais (revisão R1, etapa 3).
+"""make_composition_table.py — tables for the strengthened compositional baselines (revision R1).
 
-Lê results/json/composition_baselines_metrics.json e escreve
-results/tables/composition_baselines.md. Nenhum valor digitado à mão.
+Reads results/json/composition_baselines_metrics.json and writes
+results/tables/composition_baselines.md. No value is typed by hand.
+
+Usage:
+    python code/05_figures/make_composition_table.py
 """
 import os, json
 import numpy as np
