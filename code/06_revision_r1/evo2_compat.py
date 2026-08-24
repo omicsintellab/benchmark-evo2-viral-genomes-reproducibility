@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""evo2_compat.py — helpers compartilhados pelos scripts da revisão R1.
+"""evo2_compat.py — helpers shared by the revision R1 scripts.
 
-Cópia fiel de `patch_fp8` e `make_windows` de `code/02_embeddings/probe_evo2_viral.py`,
-para que os scripts da revisão rodem soltos no Studio sem clonar o repositório inteiro.
-Manter em sincronia com o original — a janela/stride/max_windows definem a comparabilidade
-com os embeddings já cacheados.
+Faithful copy of `patch_fp8` and `make_windows` from
+`code/02_embeddings/probe_evo2_viral.py`, so that the revision scripts run standalone on a GPU
+host without cloning the whole repository. Keep in sync with the original: the window, stride
+and max_windows settings define comparability with the cached embeddings.
 """
 import os
 import time
@@ -16,12 +16,12 @@ def log(*a):
 
 
 def patch_fp8(model_name):
-    """Em Hopper/Ada (cc>=8.9) mantém FP8 LIGADO; em GPU < 8.9 desliga interceptando a
+    """On Hopper/Ada (cc >= 8.9) keeps FP8 ON; on cards below 8.9 disables it by intercepting the
     leitura da config do Evo2. Idempotente.
 
-    O L4 da g6 é Ada, cc 8.9 -> FP8 permanece ligado, igual à corrida original no H100.
-    Isso importa: o controle de precisão do artigo (Tabela S1) mostra que forçar bf16
-    degrada bastante, então rodar em bf16 produziria embeddings não comparáveis.
+    This matters: the precision control of the paper (Supplementary Table S3) shows that
+    forcing bf16 degrades performance substantially, so a bf16 run would produce embeddings
+    that are not comparable with the cached ones.
     """
     import yaml, torch
     import evo2.models as M
@@ -43,10 +43,10 @@ def patch_fp8(model_name):
 
 
 def resolve_weights(weights_local, model_name):
-    """`Evo2(local_path=...)` espera o **arquivo .pt**, não um diretório.
+    """`Evo2(local_path=...)` expects the **.pt file**, not a directory.
 
-    Aceita as duas formas para não repetir o erro:
-      - caminho direto do .pt                     -> usa como está
+    Both forms are accepted so the mistake is not repeated:
+      - direct path to the .pt                    -> used as is
       - raiz com <root>/<model>/<model>.pt        -> resolve
       - raiz com <root>/<model>.pt                -> resolve
       - None                                      -> deixa o Evo2 baixar do HF
@@ -57,7 +57,7 @@ def resolve_weights(weights_local, model_name):
     if os.path.isfile(weights_local):
         return weights_local
     if not os.path.isdir(weights_local):
-        raise FileNotFoundError(f"--weights-local não existe: {weights_local}")
+        raise FileNotFoundError(f"--weights-local does not exist: {weights_local}")
     for cand in (os.path.join(weights_local, model_name, f"{model_name}.pt"),
                  os.path.join(weights_local, f"{model_name}.pt")):
         if os.path.isfile(cand):
@@ -69,14 +69,14 @@ def resolve_weights(weights_local, model_name):
         log(f"pesos resolvidos: {hits[0]}")
         return hits[0]
     raise FileNotFoundError(
-        f"--weights-local é um diretório e não achei o .pt de {model_name} nele. "
+        f"--weights-local is a directory and the .pt of {model_name} was not found in it. "
         f"Candidatos: {hits[:5] or 'nenhum .pt encontrado'}. "
         f"Passe o caminho do arquivo, ex.: {weights_local}/{model_name}/{model_name}.pt")
 
 
 def describe_devices(inner, max_children=40):
-    """Onde vivem os parâmetros de cada filho de primeiro nível. Diagnóstico para erro de
-    device misto — diz QUAL módulo ficou fora do lugar."""
+    """Where the parameters of each top-level child live. Diagnostic for mixed-device errors:
+    it says WHICH module ended up in the wrong place."""
     import torch
     out = {}
     for name, mod in list(inner.named_children())[:max_children]:
@@ -92,20 +92,20 @@ def describe_devices(inner, max_children=40):
 def shard_pipeline(inner, devices=None, verbose=True):
     """Fatiamento manual em pipeline pelos blocos do StripedHyena.
 
-    Por que não `accelerate.dispatch_model`: ele instala hooks que movem os *inputs* de
-    cada submódulo para o device daquele submódulo, o que pressupõe que todo o fluxo de
-    dados passa pelas assinaturas de forward. O StripedHyena não satisfaz isso e o forward
+    Why not `accelerate.dispatch_model`: it installs hooks that move each submodule's *inputs*
+    to that submodule's device, which assumes all data flow passes through forward
+    signatures. StripedHyena does not satisfy that, and the forward
     morre com "Expected all tensors to be on the same device" mesmo carregando bem.
 
-    Aqui a divisão é explícita e mínima:
+    Here the split is explicit and minimal:
       - acha a ModuleList mais longa (os blocos), sem depender do nome;
-      - distribui os blocos entre as GPUs em fatias contíguas (pipeline);
+      - blocks are distributed across GPUs in contiguous slices (pipeline);
       - todo o resto (embedding, norm final, unembed) fica no device 0;
       - um pre-hook por bloco move o estado oculto para o device do bloco, e um hook no
-        último bloco traz o resultado de volta para o device 0.
+        the last block brings the result back to device 0.
 
-    Pressupõe que o único dado que atravessa blocos é o tensor de estado oculto. Se houver
-    tensor guardado como atributo solto (não parâmetro nem buffer), ele não se move com
+    It assumes the only data crossing blocks is the hidden-state tensor. A tensor held as a
+    loose attribute (neither parameter nor buffer) will not move with
     `.to()` e o forward vai falhar — `describe_devices` ajuda a achar.
     """
     import torch, torch.nn as nn
@@ -119,19 +119,19 @@ def shard_pipeline(inner, devices=None, verbose=True):
         if isinstance(mod, nn.ModuleList) and (blocks is None or len(mod) > len(blocks)):
             name_blocks, blocks = name, mod
     if blocks is None or len(blocks) < len(devices):
-        raise RuntimeError("não achei uma ModuleList de blocos grande o bastante para fatiar")
+        raise RuntimeError("no ModuleList of blocks large enough to shard was found")
 
     n, nd = len(blocks), len(devices)
 
-    # A GPU 0 carrega embedding + norm final + unembed ALÉM da sua fatia de blocos, então
-    # divisão igual a sobrecarrega: no 20B em 4x L40S, com 6 blocos por card, o OOM em 32k
-    # acontece na GPU 0 (alocação única de 16 GB) enquanto as outras têm folga. head_relief
-    # tira N blocos da GPU 0 e redistribui. Ajustável por EVO2_HEAD_RELIEF.
-    # DEFAULT 0 = divisão igual, que é a configuração MEDIDA como boa (20B ate 16k na
-    # g6e.12xlarge). head_relief=2 deu "illegal memory access" ja em 4k: os kernels do
-    # StripedHyena alocam workspace na GPU CORRENTE, nao na GPU do tensor (o proprio vortex
-    # loga "Allocating cublas workspace for device=N"), entao mexer no balanceamento sem
-    # acertar o device corrente quebra. Ver EVO2_SET_DEVICE abaixo.
+    # GPU 0 carries the embedding, the final norm and the unembed BESIDES its slice of blocks,
+    # so an equal split overloads it: the OOM at 32k happens on GPU 0 (a single 16 GB
+    # allocation) while the others have room. head_relief takes N blocks off GPU 0 and
+    # redistributes them; adjustable through EVO2_HEAD_RELIEF.
+    # DEFAULT 0 = equal split, which is the configuration MEASURED as good (20B up to 16k in
+    # a 4-card setup). head_relief=2 gave an "illegal memory access" already at 4k: the
+    # StripedHyena kernels allocate workspace on the CURRENT GPU, not on the tensor's GPU
+    # (vortex itself logs "Allocating cublas workspace for device=N"), so changing the balance
+    # without also setting the current device breaks. See EVO2_SET_DEVICE below.
     head_relief = int(os.environ.get("EVO2_HEAD_RELIEF", "0"))
     base = n // nd
     quotas = [base] * nd
@@ -147,17 +147,17 @@ def shard_pipeline(inner, devices=None, verbose=True):
         assign += [d] * q
     assert len(assign) == n
 
-    # resto no device 0
+    # everything else on device 0
     for name, mod in inner.named_children():
         if name != name_blocks:
             mod.to(devices[0])
     for _, p in inner.named_parameters(recurse=False):
         p.data = p.data.to(devices[0])
 
-    # EVO2_SET_DEVICE=1 faz o pre-hook trocar tambem a GPU CORRENTE, nao so mover o tensor.
-    # Necessario se os kernels alocarem workspace no current_device (hipotese para o
-    # "illegal memory access" com balanceamento desigual). OFF por padrao: a configuracao
-    # equilibrada ja funciona sem isso, e ligar mexe no caminho que esta validado.
+    # EVO2_SET_DEVICE=1 makes the pre-hook switch the CURRENT GPU as well, not just move the
+    # tensor. Needed if the kernels allocate workspace on current_device (the hypothesis for
+    # the "illegal memory access" under an uneven balance). OFF by default: the even split
+    # works without it, and turning it on changes the validated path.
     set_dev = os.environ.get("EVO2_SET_DEVICE", "0") == "1"
 
     def mover(dev):
@@ -222,8 +222,8 @@ def read_fasta(path, wanted=None):
 
 
 def mean_pool_embed(model, layer, seq, window, stride, max_windows, device):
-    """Mean-pool do embedding de UMA camada, sobre as janelas — mesma mecânica de
-    `multi_layer_embed` em sweep_layers_20b.py, com hook que já reduz na GPU."""
+    """Mean-pool the embedding of ONE layer over the windows: same mechanics as
+    `multi_layer_embed` in sweep_layers_20b.py, with a hook that reduces on the GPU."""
     import torch
     seq = seq.upper()
     pooled, acc = {}, []

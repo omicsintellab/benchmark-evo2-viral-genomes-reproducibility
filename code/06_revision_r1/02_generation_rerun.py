@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
-"""02_generation_rerun.py — geração re-rodada PERSISTINDO as sequências (revisão R1 4.2, R2 #11/#12).
+"""02_generation_rerun.py — generation re-run, PERSISTING the sequences (R1 4.2, R2 #11/#12).
 
-R2 #12: "a similaridade de 4-mer mede sobretudo composição e não avalia recuperação da
-sequência correta nem preservação da estrutura codificante. Devem ser incluídas identidade
-de sequência, distância de edição, continuidade de ORF, frequência de frameshift e stop
-prematuro. Resultados por genoma, estimativas de incerteza e sensibilidade aos parâmetros
-de decodificação também devem ser apresentados."
+R2 #12 notes that 4-mer similarity measures mostly composition, and evaluates neither recovery
+of the correct sequence nor preservation of coding structure. It asks for sequence identity,
+edit distance, ORF continuity, frameshift frequency and premature stops, plus per-genome
+results, uncertainty estimates and sensitivity to decoding parameters.
 
-Nada disso é calculável a partir do que temos: o script original consumia as sequências
-geradas em memória e gravava só bits/nt e cosseno de 4-mer. Este script re-roda a geração
-**salvando as sequências**, com replicatas por genoma e varredura de temperatura/top_k.
-As métricas caras de comparar sequência (identidade, edit distance, ORF, stop prematuro)
-saem depois em CPU — aqui só se produz o material.
+None of that is computable from what the original run kept: it consumed the generated
+sequences in memory and stored only bits/nt and 4-mer cosine. This script re-runs generation
+**saving the sequences**, with replicates per genome and a temperature/top-k sweep. The
+expensive sequence-comparison metrics are computed afterwards on CPU; here we only produce the
+material.
 
-Mantém as MESMAS accessions e os mesmos prompt_bp/gap_bp da corrida original, lidos do CSV
-já publicado, para que a comparação com o resultado do artigo seja limpa.
+It reuses the SAME accessions and the same prompt_bp/gap_bp as the original run, read from the
+published CSV, so that the comparison with the paper's result stays clean. It also writes the
+TRUE gap sequences; without them nothing can be compared downstream.
 
-Uso:
-    python 02_generation_rerun.py --model evo2_20b --weights-local /path \\
-        --fasta all_genomes.fasta --ref-csv generation_completion_evo2_20b.csv \\
-        --temperatures 0.7,1.0 --top-ks 4 --n-samples 3 --out-dir ./out
+Usage:
+    python 02_generation_rerun.py --weights-local <WEIGHTS> --completion-csv <csv> \
+        --fasta all_genomes.fasta --out-dir ./out
 """
 import os, sys, json, time, argparse
 import numpy as np
@@ -36,19 +35,19 @@ def main():
                     help="Caminho do .pt OU raiz que contenha <model>/<model>.pt.")
     ap.add_argument("--fasta", required=True)
     ap.add_argument("--ref-csv", required=True,
-                    help="generation_completion_evo2_20b.csv da corrida original "
+                    help="generation_completion_evo2_20b.csv da run original "
                          "(define accessions e set_label).")
     ap.add_argument("--prompt-bp", type=int, default=4096)
     ap.add_argument("--gap-bp", type=int, default=1024)
     ap.add_argument("--temperatures", default="0.7,1.0")
     ap.add_argument("--top-ks", default="4")
     ap.add_argument("--n-samples", type=int, default=3,
-                    help="Replicatas por genoma e por configuração (dá a incerteza).")
+                    help="Replicates per genome and configuration (gives the uncertainty).")
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--limit", type=int, default=0, help="dry-run: só os N primeiros.")
+    ap.add_argument("--limit", type=int, default=0, help="dry run: first N only.")
     ap.add_argument("--batch-size", type=int, default=8,
-                    help="Prompts por chamada de generate(). Batch 1 desperdiça a GPU; "
+                    help="Prompts per generate() call. Batch 1 wastes the GPU; "
                          "em OOM o lote se divide sozinho.")
     ap.add_argument("--sharded", action="store_true", help="Fatia via accelerate.")
     ap.add_argument("--pipeline", action="store_true",
@@ -78,7 +77,7 @@ def main():
         ref = ref.iloc[a.shard_index::a.shard_count].reset_index(drop=True)
         log(f"shard {a.shard_index+1}/{a.shard_count}: {len(ref)} genomas deste processo")
     log(f"genomas: {len(ref)} | temps {temps} | top_k {topks} | {a.n_samples} replicatas")
-    log(f"total de gerações: {len(ref)*len(temps)*len(topks)*a.n_samples}")
+    log(f"total generations: {len(ref)*len(temps)*len(topks)*a.n_samples}")
 
     wl = resolve_weights(a.weights_local, a.model)
     patch_fp8(a.model)
@@ -100,7 +99,7 @@ def main():
         dmap = infer_auto_device_map(inner, max_memory=mm, dtype=torch.bfloat16,
                                      no_split_module_classes=ns)
         if any(v in ("cpu", "disk") for v in dmap.values()):
-            log("ERRO: não cabe nas GPUs. Rode 00_preflight.py."); sys.exit(2)
+            log("ERROR: does not fit on the GPUs. Run 00_preflight.py."); sys.exit(2)
         model.model = dispatch_model(inner, device_map=dmap)
     else:
         model.model.to(a.device)
@@ -108,10 +107,10 @@ def main():
 
     import gc
 
-    # Nomes sob os quais o Evo2/vortex costuma pendurar o cache de inferência. O log
+    # Attribute names under which Evo2/vortex tends to hang the inference cache. The log
     # "Initializing inference params with max_seqlen=..." aparece a CADA generate(), e o
     # cache anterior fica preso ao objeto do modelo: a GPU 0 chegou a 39,5 GiB quando os
-    # pesos dela são ~12 GiB. Sem limpar, a corrida estoura no meio mesmo com batch 1.
+    # showed GPU 0 reaching 39.5 GiB with ~12 GiB of weights. Without clearing, a long run OOMs.
     STATE_ATTRS = ["inference_params", "_inference_params", "inference_params_dict",
                    "cache", "_cache", "kv_cache"]
 
@@ -142,11 +141,11 @@ def main():
         return list(g)
 
     def gen_batch(prefixes, n, temperature, top_k):
-        """Gera um LOTE de prompts. Em falha, divide o lote pela metade até 1.
+        """Generate a BATCH of prompts. On failure, halve the batch down to 1.
 
-        A limpeza acontece FORA do `except`: dentro dele o traceback mantém referência aos
-        tensores da tentativa que estourou, então `empty_cache()` não devolve nada e a
-        retentativa nasce condenada — foi o que aconteceu na primeira versão, em que até o
+        The cleanup happens OUTSIDE the `except`: inside it the traceback still references the
+        tensors of the attempt that blew up, so `empty_cache()` returns nothing and the retry
+        is doomed from the start, which is what an earlier version did, where even the
         lote de 1 falhava depois de um OOM anterior."""
         err = None
         try:
@@ -154,10 +153,10 @@ def main():
         except Exception as e:
             err = f"{type(e).__name__}: {str(e)[:160]}"
             oom = "out of memory" in str(e).lower() or "OutOfMemory" in type(e).__name__
-        # aqui o except já terminou: o traceback foi descartado e a memória pode voltar
+        # the except block is over: the traceback is gone and the memory can come back
         free_generation_state()
         if len(prefixes) == 1:
-            raise RuntimeError(f"geração falhou mesmo com lote 1 — {err}")
+            raise RuntimeError(f"generation failed even at batch 1: {err}")
         log(f"    lote de {len(prefixes)} falhou ({err[:60]}); dividindo")
         h = len(prefixes) // 2
         return (gen_batch(prefixes[:h], n, temperature, top_k) +
@@ -168,7 +167,7 @@ def main():
     work = [(str(r.accession), r.set_label, T, K, rep)
             for r in ref.itertuples() for T in temps for K in topks
             for rep in range(a.n_samples)]
-    log(f"lista de trabalho: {len(work)} gerações | batch {a.batch_size}")
+    log(f"work list: {len(work)} generations | batch {a.batch_size}")
 
     fa = open(os.path.join(a.out_dir, f"generated_{a.model}{sfx}.fasta"), "w")
     rows, t0, done = [], time.time(), 0
@@ -192,17 +191,17 @@ def main():
                                  "seq_id": sid, "gen_len": len(g),
                                  "prompt_bp": a.prompt_bp, "gap_bp": a.gap_bp})
                 done += len(chunk)
-                free_generation_state()   # sem isto o cache de inferência acumula e estoura
+                free_generation_state()   # without this the inference cache accumulates and OOMs
                 el = time.time() - t0
                 free_gb = (min(torch.cuda.mem_get_info(i)[0]
                                for i in range(torch.cuda.device_count())) / 1024**3
                            if torch.cuda.is_available() else float("nan"))
-                log(f"  {done}/{len(work)} | {el/done:.1f}s/geração | "
+                log(f"  {done}/{len(work)} | {el/done:.1f}s/generation | "
                     f"ETA {(len(work)-done)*el/done/60:.0f} min | "
-                    f"GPU mais cheia: {free_gb:.1f} GB livres")
+                    f"fullest GPU: {free_gb:.1f} GB free")
     fa.close()
 
-    # a sequência VERDADEIRA do gap vai junto — sem ela nada se compara depois em CPU
+    # the TRUE gap sequence goes with it: without it nothing can be compared later on CPU
     with open(os.path.join(a.out_dir, f"true_gaps_{a.model}{sfx}.fasta"), "w") as th:
         for r in ref.itertuples():
             acc = str(r.accession); full = seqs[acc].upper()
@@ -215,7 +214,7 @@ def main():
             "gap_bp": a.gap_bp, "seed": a.seed, "n_generated": int(len(df)),
             "sharded": a.sharded, "elapsed_min": round((time.time() - t0) / 60, 1)}
     json.dump(meta, open(os.path.join(a.out_dir, f"generation_rerun_meta{sfx}.json"), "w"), indent=1)
-    log(f"-> {len(df)} sequências geradas em {meta['elapsed_min']} min, em {a.out_dir}")
+    log(f"-> {len(df)} sequences generated in {meta['elapsed_min']} min, in {a.out_dir}")
 
 
 if __name__ == "__main__":

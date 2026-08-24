@@ -1,41 +1,39 @@
 #!/usr/bin/env python3
-"""composition_baselines.py — baselines composicionais fortes (revisão R1 3.4, R2 #3).
+"""composition_baselines.py — strengthened compositional baselines (R1 3.4, R2 #3).
 
-R1 3.4: "uma tabela de frequência de 6-mer é apenas UMA forma de descrever composição.
-Outras features simples — k-mers mais longos, uso de códons, número e comprimento de ORFs,
-viés de fita, repetições — podem explicar parte do mesmo sinal."
-R2 #3: "k-mers globais não retêm estrutura de ORF, periodicidade de quadro de leitura,
-distribuição de stop codons, espaçamento gênico nem ordem de longo alcance. Controles
-derivados de sequência mais fortes — contagem de ORFs, maior ORF, cobertura por ORF,
-densidade de stop codons e potencial codificante em 6 quadros — devem ser incluídos."
+R1 3.4 notes that a 6-mer frequency table is only ONE way of describing composition: longer
+k-mers, codon usage, ORF number and length, strand bias and repeats could explain part of the
+same signal. R2 #3 adds that global k-mers retain no ORF structure, no reading-frame
+periodicity, no stop-codon distribution and no gene spacing, and asks for stronger
+sequence-derived controls.
 
-Este script constrói exatamente isso e re-roda os probes. A pergunta que ele responde:
-**o Evo 2 continua à frente quando o baseline deixa de ser um 6-mer e passa a ser tudo o que
-se consegue extrair da sequência sem modelo?**
+This script builds exactly that and re-runs the probes, to answer: does Evo 2 stay ahead when
+the baseline is no longer a 6-mer but everything that can be extracted from the sequence
+without a model?
 
-Representações:
-  gc_len      GC + log(comprimento)                          — referência do artigo
-  kmer{3..6}  frequências de k-mer                           — "vários k" (R1 3.4)
-  multik      concatenação normalizada de k=1..6             — "multi-k combinado" (R1 3.4)
-  codon       64 frequências de códon, em quadro, dos ORFs   — "uso de códons" (R1 3.4)
-  dicodon     4096 frequências de dicódon, em quadro         — 6-mer COM quadro de leitura
-  orf         features de ORF e potencial codificante        — R2 #3
-  compo_all   multik + codon + orf                           — o baseline mais forte possível
-  evo2        Evo 2 20B blocks.18                            — o que está sendo testado
+Representations:
+  gc_len      GC + log(length)                            reference used in the paper
+  kmer{3..6}  k-mer frequencies                           "several k" (R1 3.4)
+  multik      normalised concatenation of k = 1..6        "combined multi-k" (R1 3.4)
+  codon       64 in-frame codon frequencies from ORFs     "codon usage" (R1 3.4)
+  dicodon     4096 in-frame dicodon frequencies           a 6-mer WITH reading frame
+  orf         ORF summary and coding potential            R2 #3
+  compo_all   multik + codon + orf                        the strongest baseline available
+  evo2        Evo 2 20B blocks.18                         the representation under test
 
-`dicodon` é o contraste mais afiado do conjunto: tem a mesma dimensionalidade do 6-mer e a
-mesma ordem de composição, mas **em quadro de leitura**. Se o 6-mer perde e o dicodon ganha, o
-que faltava ao baseline era quadro, não comprimento de k.
+`dicodon` is the sharpest contrast of the set: same dimensionality as the 6-mer and the same
+order of composition, but in reading frame. If the 6-mer loses and the dicodon wins, what the
+baseline lacked was frame, not a longer k.
 
-Esquemas de CV: `cl95` (pré-registrado, primário) e `family` (interpretativo). Mecânica de
-fold importada de family_cv.py — os testes pareados só valem se os folds forem os mesmos.
+Cross-validation schemes: `cl95` (pre-registered, primary) and `family` (interpretive). Fold
+mechanics are imported from family_cv.py: the paired tests are only valid if the folds match.
 
-Nota de cobertura: k>6 NÃO é rodado. k=7 são 16.384 dimensões e o custo do ridge dominaria a
-corrida sem acrescentar ao argumento, já que `dicodon` cobre a mesma escala com quadro. Isso é
-limitação declarada, não omissão.
+Coverage note: k > 6 is NOT run. k = 7 means 16,384 dimensions and the ridge cost would
+dominate the run without adding to the argument, since `dicodon` covers the same scale with
+frame. This is a declared limitation, not an omission.
 
-Uso:
-    PYTHONPATH=<repro>/code/03_analysis python composition_baselines.py --out ../../results/json
+Usage:
+    PYTHONPATH=<repo>/code/03_analysis python composition_baselines.py --out ../../results/json
 """
 import os, sys, json, time, argparse
 import numpy as np
@@ -49,21 +47,21 @@ from family_cv import (PRIMARY, NEGCTRL, reg_group, reg_rand, nadeau_bengio, boo
 from viral_features_extended import dinuc_oe
 
 # --- as DUAS CLASSES de baseline -------------------------------------------------------
-# R1 3.4 pede baselines de *composição de sequência*. Um scan de ORF não é composição: é uma
-# versão simplificada do próprio pipeline de anotação que produziu os alvos (n_orfs_per_kb
-# prevendo n_genes é quase a mesma medida por outra via). Misturar os dois numa coluna só de
-# "melhor baseline" responde a pergunta errada, então eles são reportados separados.
+# R1 3.4 asks for *sequence composition* baselines. An ORF scan is not composition: it is a
+# simplified version of the very annotation pipeline that produced the targets (n_orfs_per_kb
+# predicting n_genes is nearly the same measurement by another route). Collapsing both into a
+# single "best baseline" column answers the wrong question, so they are reported separately.
 #
 # codon/dicodon ficam na classe COMPOSICIONAL embora exijam um scan de 6 quadros para definir
-# quadro de leitura. É a escolha CONSERVADORA: fortalece a classe composicional e torna mais
-# difícil para o Evo 2 vencê-la.
+# reading frame. This is the CONSERVATIVE choice: it strengthens the compositional class and
+# makes it harder for Evo 2 to win.
 CLASSES = {
     "compositional": ["kmer3", "kmer4", "kmer5", "kmer6", "multik", "codon", "dicodon", "gc_len"],
     "annotation_like": ["orf", "compo_all"],
 }
 
 B = {"A": 0, "C": 1, "G": 2, "T": 3}
-STOPS = {48, 50, 56}           # TAA, TAG, TGA em código base-4 (A0 C1 G2 T3)
+STOPS = {48, 50, 56}           # TAA, TAG, TGA in base-4 code (A0 C1 G2 T3)
 ATG = 14
 MIN_ORF_BP = 300
 
@@ -95,7 +93,7 @@ def codons_of(code, frame):
 
 
 def orf_features(seq):
-    """ORFs em 6 quadros + densidade de stop + uso de códon/dicódon em quadro."""
+    """Six-frame ORFs, stop density, and in-frame codon/dicodon usage."""
     code = encode(seq)
     L = max(len(code), 1)
     rc = revcomp_code(code)
@@ -150,7 +148,7 @@ def orf_features(seq):
 def build_reps(accs, md):
     log = lambda *a: print(f"[{time.strftime('%H:%M:%S')}]", *a, flush=True)
     seqs = seqs_for(list(accs))
-    log(f"CONTROLE POSITIVO — accessions: {len(accs)} | sequências achadas: {len(seqs)}")
+    log(f"POSITIVE CONTROL: accessions {len(accs)} | sequences found {len(seqs)}")
     if len(seqs) < len(accs):
         raise SystemExit(f"FASTA incompleto: faltam {len(accs)-len(seqs)}")
 
@@ -163,7 +161,7 @@ def build_reps(accs, md):
         SA.K = old
     reps["multik"] = np.hstack([reps[f"kmer{k}"] for k in (3, 4, 5, 6)]).astype(np.float32)
 
-    log("  ORFs, códons e dicódons em 6 quadros ...")
+    log("  six-frame ORFs, codons and dicodons ...")
     frows, codon, dicod = [], [], []
     t0 = time.time()
     for i, a in enumerate(accs, 1):
@@ -184,7 +182,7 @@ def build_reps(accs, md):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=os.path.join(HERE, "..", "..", "results", "json"))
-    ap.add_argument("--limit", type=int, default=0, help="dry-run: só os N primeiros genomas.")
+    ap.add_argument("--limit", type=int, default=0, help="dry run: first N genomes only.")
     a = ap.parse_args()
     log = lambda *x: print(f"[{time.strftime('%H:%M:%S')}]", *x, flush=True)
 
@@ -203,7 +201,7 @@ def main():
     accs, md, X20 = accs[keep], md[keep], X20.astype(np.float32)[keep]
     if a.limit:
         accs, md, X20 = accs[:a.limit], md.iloc[:a.limit], X20[:a.limit]
-    log(f"população: {len(accs)} genomas com família")
+    log(f"population: {len(accs)} genomes with a family")
 
     reps, orf_cols = build_reps(accs, md)
     reps["evo2_20b_blocks18"] = X20
@@ -220,8 +218,8 @@ def main():
            "config": {"splits": SPLITS, "repeats": REPEATS, "min_orf_bp": MIN_ORF_BP,
                       "kmers": [3, 4, 5, 6], "orf_features": orf_cols,
                       "dims": {k: int(v.shape[1]) for k, v in reps.items()},
-                      "coverage_note": "k>6 nao rodado: 16.384+ dims dominariam o custo sem "
-                                       "acrescentar ao argumento, ja que dicodon cobre a mesma "
+                      "coverage_note": "k>6 not run: 16,384+ dims would dominate the cost without "
+                                       "adding to the argument, since dicodon covers the same "
                                        "escala com quadro de leitura."},
            "targets": {}}
 
@@ -277,11 +275,11 @@ def main():
     out["tests"] = tests
     out["classes"] = CLASSES
     out["classes_note"] = (
-        "R1 3.4 pede baselines de COMPOSICAO. Um scan de ORF nao e composicao: e uma versao "
-        "simplificada do pipeline de anotacao que produziu os alvos, entao as duas classes sao "
-        "reportadas separadas. codon/dicodon entram na classe composicional apesar de exigirem "
+        "R1 3.4 asks for COMPOSITION baselines. An ORF scan is not composition: it is a "
+        "simplified version of the annotation pipeline that produced the targets, so the two "
+        "classes are reported separately. codon/dicodon count as compositional despite needing "
         "um scan de 6 quadros para definir quadro de leitura -- escolha conservadora, que "
-        "fortalece a classe composicional.")
+        "strengthens the compositional class.")
 
     os.makedirs(a.out, exist_ok=True)
     dst = os.path.join(a.out, "composition_baselines_metrics.json")

@@ -1,9 +1,9 @@
 {
- "source": "codon_enc_cds.parquet (S3), destilado — o parquet nao e versionado",
+ "source": "distilled from codon_enc_cds.parquet; the parquet itself is not versioned",
  "n_records": 1200,
  "feature_subset_n": 1200,
- "coverage_note": "1200/1200 records do subconjunto de features",
- "scale_note": "ENC vai de 20 (uso de codons maximamente enviesado) a 61 (uniforme)",
+ "coverage_note": "1200/1200 records of the feature subset",
+ "scale_note": "ENC ranges from 20 (maximally biased codon usage) to 61 (uniform)",
  "overall": {
   "n": 1200,
   "median": 50.9,

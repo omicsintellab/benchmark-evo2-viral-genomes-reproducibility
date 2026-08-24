@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""make_family_cv_table.py — tabelas do CV agrupado por família (revisão R1).
+"""make_family_cv_table.py — tables for the family-grouped cross-validation (revision R1).
 
-Lê results/json/family_cv_metrics.json (produzido por code/03_analysis/family_cv.py)
-e escreve results/tables/family_cv.md. Nenhum valor é digitado à mão.
+Reads results/json/family_cv_metrics.json (produced by code/03_analysis/family_cv.py) and
+writes results/tables/family_cv.md. No value is typed by hand.
 
-Uso: python code/05_figures/make_family_cv_table.py
+Usage:
+    python code/05_figures/make_family_cv_table.py
 """
 import os, json, numpy as np
 from scipy import stats
@@ -87,7 +88,7 @@ def main():
         L.append(f"| {t} | {np.mean(e):.3f} | {np.mean(g):.3f} | {np.mean(e) - np.mean(g):.3f} | "
                  f"{tt:.2f} | {fp(p)} |")
 
-    # --- T4: LOFO por familia
+    # --- T4: leave-one-family-out
     L.append("\n## Table R1-D. Leave-one-family-out, Evo 2 — pooled vs per-family\n")
     L.append("The pooled R² is computed over the stacked out-of-fold predictions; the per-family "
              "R² is computed **within** each held-out family. A pooled R² well above the per-family "
@@ -101,7 +102,7 @@ def main():
         nneg = sum(1 for x in pf if x < 0)
         L.append(f"| {t} | {l['pooled_r2']:.3f} | {np.median(pf):.3f} | {nneg}/{len(pf)} |")
 
-    # --- T5: controle negativo
+    # --- T5: negative control
     L.append("\n## Table R1-E. Pre-declared negative control (dinucleotide composition)\n")
     L.append("`cpg_oe` and `upa_oe` are composition targets, declared in advance as cases where the "
              "6-mer baseline is **expected** to win. Outside the multiplicity correction; they are a "
@@ -115,7 +116,7 @@ def main():
         L.append(f"| {t} | {e:.3f} | {k:.3f} | {v['delta_mean']:.3f} | "
                  f"[{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}] | {fp(v['p_raw'])} |")
 
-    # --- T6: CV dentro de família (se disponível)
+    # --- T6: within-family CV, when available
     WF = os.path.join(REPO, "results", "json", "within_family_cv_metrics.json")
     if os.path.exists(WF):
         w = json.load(open(WF))

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""within_family_cv.py — CV DENTRO de cada família (revisão R1 3.2).
+"""within_family_cv.py — cross-validation WITHIN each family (revision R1 3.2).
 
-Complementa family_cv.py. O leave-one-family-out mede duas coisas ao mesmo tempo e
-não as separa: (a) existe sinal de arquitetura dentro de uma família? e (b) esse
-sinal transfere de uma família para outra? Um R² baixo no LOFO pode ser ausência de
-sinal intra-família OU apenas restrição de amplitude — dentro de uma família a
-variação do alvo é muito menor que a global, e o R² fica quase zerado mesmo com um
-modelo bom.
+Complements family_cv.py. Leave-one-family-out measures two things at once and does not
+separate them: (a) is there architecture signal inside a family, and (b) does that signal
+transfer from one family to another? A low LOFO R2 can mean no within-family signal OR merely
+restriction of range — within a family the target varies far less than globally, and R2 falls
+to near zero even for a good model.
 
-Este script isola (a): treina e testa **dentro** da mesma família, para as famílias
-com n >= MIN_N. Reporta junto a razão DP_intra/DP_global de cada alvo em cada
-família, que é a chave para ler o número.
+This script isolates (a): it trains and tests **within** the same family, for families with
+n >= MIN_N. It reports alongside the ratio of within-family to global standard deviation for
+each target and family, which is the key to reading the number.
 
-R² por família é calculado sobre as predições out-of-fold empilhadas (uma estimativa
-por repetição), não como média de R² de fold — com n pequeno a média de R² de fold é
-instável.
+Per-family R2 is computed over stacked out-of-fold predictions (one estimate per repeat), not
+as a mean of per-fold R2, which is unstable at small n.
 
-Uso:
-    SCALE_DATA=<dir> SCALE_EMB20B=<dir> python code/03_analysis/within_family_cv.py [--out DIR]
+Usage:
+    SCALE_DATA=<dir> SCALE_EMB20B=<dir> python within_family_cv.py --out ../../results/json
 """
 import os, sys, json, argparse, numpy as np, pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -37,7 +35,7 @@ ALPHAS = [1, 10, 100, 1000]
 
 
 def oof_r2(X, y, n_splits=SPLITS, repeats=REPEATS):
-    """R² sobre predições out-of-fold empilhadas, média entre repetições."""
+    """R2 over stacked out-of-fold predictions, averaged across repeats."""
     out = []
     for r in range(repeats):
         cv = KFold(n_splits=n_splits, shuffle=True, random_state=SEED + r)
@@ -72,7 +70,7 @@ def main():
     X20_k = X20.astype(np.float32)[keep]
     fam = md["family"].values.astype(str)
 
-    print(f"[within_family] {len(accs_k)} genomas com família", flush=True)
+    print(f"[within_family] {len(accs_k)} genomes with a family", flush=True)
     print("[within_family] montando 6-mer e GC+len ...", flush=True)
     KM = kmer_matrix(accs_k.tolist())
     GL = gclen(md)
@@ -80,7 +78,7 @@ def main():
 
     sizes = pd.Series(fam).value_counts()
     fams = sizes[sizes >= MIN_N].index.tolist()
-    print(f"[within_family] famílias com n >= {MIN_N}: {len(fams)}", flush=True)
+    print(f"[within_family] families with n >= {MIN_N}: {len(fams)}", flush=True)
 
     out = {"config": {"min_n": MIN_N, "splits": SPLITS, "repeats": REPEATS, "seed": SEED,
                       "alphas": ALPHAS, "families": {f: int(sizes[f]) for f in fams}},
@@ -92,7 +90,7 @@ def main():
         sd_global = float(np.nanstd(yall))
         rec = {"log1p": logt, "sd_global": sd_global, "families": {}}
         print(f"\n[within_family] === {tname} (DP global={sd_global:.3f}) ===", flush=True)
-        print(f"  {'família':<22}{'n':>5}{'DPi/DPg':>9}{'evo2':>9}{'6mer':>9}{'gc_len':>9}")
+        print(f"  {'family':<22}{'n':>5}{'SDi/SDg':>9}{'evo2':>9}{'6mer':>9}{'gc_len':>9}")
         for f in fams:
             m = (fam == f) & np.isfinite(yall)
             if m.sum() < MIN_N: continue
@@ -110,7 +108,7 @@ def main():
                   f"{e['evo2_20b_blocks18']['r2']:>9.3f}{e['6mer']['r2']:>9.3f}"
                   f"{e['gc_len']['r2']:>9.3f}", flush=True)
 
-        # resumo: mediana entre famílias + Wilcoxon pareado por família (exploratório)
+        # summary: median across families + per-family paired Wilcoxon (exploratory)
         ev = [v["reps"]["evo2_20b_blocks18"]["r2"] for v in rec["families"].values()]
         km = [v["reps"]["6mer"]["r2"] for v in rec["families"].values()]
         gl = [v["reps"]["gc_len"]["r2"] for v in rec["families"].values()]
@@ -124,7 +122,7 @@ def main():
             w2, p2 = stats.wilcoxon(ev, gl)
             summ["wilcoxon_evo2_vs_gclen"] = {"stat": float(w2), "p": float(p2)}
         rec["summary"] = summ
-        print(f"  -> mediana entre famílias: evo2={summ['median_r2']['evo2_20b_blocks18']:.3f} "
+        print(f"  -> mediana entre families: evo2={summ['median_r2']['evo2_20b_blocks18']:.3f} "
               f"6mer={summ['median_r2']['6mer']:.3f} gc_len={summ['median_r2']['gc_len']:.3f} "
               f"| evo2 R2>0 em {summ['n_families_evo2_positive']}/{len(ev)}", flush=True)
         out["targets"][tname] = rec

@@ -1,30 +1,27 @@
 #!/usr/bin/env python3
-"""reextract_annotation.py — proveniência da anotação e sobreposição corrigida (R1 4.1, R2 #16/#17).
+"""reextract_annotation.py — annotation provenance and corrected overlap (R1 4.1, R2 #16/#17).
 
-R2 #16: "substituir contagem de genes por contagem de CDS quando features `gene` estão
-ausentes cria uma definição mista. Os autores devem reportar com que frequência esse
-fallback foi usado e fornecer uma análise de sensibilidade restrita a genomas
-consistentemente anotados."
+R2 #16 notes that substituting CDS counts for gene counts when `gene` features are absent
+creates a mixed definition, and asks how often that fallback was used, plus a sensitivity
+analysis restricted to consistently annotated genomes.
 
-R2 #17: "'comprimento somado de CDS menos comprimento da união' nem sempre é idêntico ao
-número de posições cobertas por mais de um CDS. O cálculo implementado e o tratamento de
-fitas opostas e de sobreposições múltiplas devem ser descritos com precisão."
+R2 #17 notes that "summed CDS length minus union length" is not always identical to the number
+of positions covered by more than one CDS, and asks for a precise description of the
+implemented calculation and of the treatment of opposite strands and multiple overlaps.
 
-Ambos são procedentes. O `extract_genome_features.py` publicado faz
-`overlap_bp = soma(spans) - união`, sobre spans coletados no ramo `t == "CDS"`, o que:
-  - conta em DOBRO onde 3+ CDS se sobrepõem;
-  - ignora fita, misturando sobreposição na mesma fita com fitas opostas.
-E `n_genes_eff = n_gene or n_cds` torna a frequência do fallback irrecuperável do TSV
-publicado (n_gene=0 com n_cds=20 é indistinguível de n_gene=20 real).
+Both are correct. The published `extract_genome_features.py` computes
+`overlap_bp = sum(spans) - union` over spans collected in the `t == "CDS"` branch, which:
+  - DOUBLE COUNTS positions where three or more CDS features overlap;
+  - ignores strand, mixing same-strand with opposite-strand overlap.
+And `n_genes_eff = n_gene or n_cds` makes the fallback frequency unrecoverable from the
+published TSV (n_gene=0 with n_cds=20 is indistinguishable from a real n_gene=20).
 
-Este script re-extrai do GenBank flat file registrando:
-  - `used_gene_fallback`  — se o record não tinha nenhuma feature `gene`
-  - `overlap_bp_published` — a métrica como publicada, para comparação
-  - `overlap_positions`    — posições cobertas por >= 2 CDS (a definição correta)
-  - `overlap_same_strand` / `overlap_opposite_strand`
+This script re-extracts from the GenBank flat files, recording per-record provenance of the
+gene count and both overlap definitions, so that the frequency of the fallback and the
+sensitivity of the target become measurable.
 
-Uso:
-    python reextract_annotation.py --gbff viral.1.genomic.gbff.gz --out ../../results/json
+Usage:
+    python reextract_annotation.py --gbff-dir <dir> --out ../../results/tables
 """
 import os, sys, gzip, json, argparse, time
 import numpy as np
@@ -60,10 +57,10 @@ def per_record(rec):
             (cds_plus if f.location.strand != -1 else cds_minus).append((s, e))
     allc = cds_plus + cds_minus
 
-    # como publicado: soma dos spans - união, sem fita, conta 3+ sobreposições em dobro
+    # as published: sum of spans minus union, strand-blind, double counts 3+ overlaps
     pub = max(0, sum(e - s for s, e in allc) - union_len(allc))
 
-    # correto: posições com cobertura >= 2, e a separação por fita
+    # correct: positions with coverage >= 2, and the split by strand
     def cov(spans):
         c = np.zeros(L + 1, np.int16)
         for s, e in spans:
@@ -87,7 +84,7 @@ def main():
     ap.add_argument("--gbff", required=True)
     ap.add_argument("--out", default="results/json")
     ap.add_argument("--accessions", default=None,
-                    help="TSV opcional com coluna 'accession' para restringir o relatório.")
+                    help="optional TSV with an 'accession' column to restrict the report.")
     ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
 

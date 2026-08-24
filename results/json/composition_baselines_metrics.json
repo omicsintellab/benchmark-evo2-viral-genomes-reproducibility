@@ -40,7 +40,7 @@
    "compo_all": 5516,
    "evo2_20b_blocks18": 8192
   },
-  "coverage_note": "k>6 nao rodado: 16.384+ dims dominariam o custo sem acrescentar ao argumento, ja que dicodon cobre a mesma escala com quadro de leitura."
+  "coverage_note": "k>6 not run: 16,384+ dims would dominate the cost without adding to the argument, since dicodon covers the same scale with reading frame."
  },
  "targets": {
   "coding_fraction": {
@@ -5542,5 +5542,5 @@
    "compo_all"
   ]
  },
- "classes_note": "R1 3.4 pede baselines de COMPOSICAO. Um scan de ORF nao e composicao: e uma versao simplificada do pipeline de anotacao que produziu os alvos, entao as duas classes sao reportadas separadas. codon/dicodon entram na classe composicional apesar de exigirem um scan de 6 quadros para definir quadro de leitura -- escolha conservadora, que fortalece a classe composicional."
+ "classes_note": "R1 3.4 asks for COMPOSITION baselines. An ORF scan is not composition: it is a simplified version of the annotation pipeline that produced the targets, so the two classes are reported separately. codon/dicodon count as compositional despite needing a six-frame scan: that is the conservative choice, and it strengthens the compositional class."
 }

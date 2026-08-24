@@ -1,38 +1,30 @@
 #!/usr/bin/env python3
-"""00_preflight.py — decide o que roda nesta GPU antes de gastar hora (revisão R1).
+"""00_preflight.py — decide what can run on this GPU before spending hours (revision R1).
 
-RODAR ISTO PRIMEIRO. O 20B em bf16 pesa ~40 GB e os scripts do artigo são single-GPU
-(`--device cuda:0`), o que funcionou porque a corrida original usou UM H100 de 80 GB.
-Em qualquer outra máquina a primeira pergunta é: cabe? E até que comprimento de contexto?
+RUN THIS FIRST. The 20B checkpoint is ~40 GB in bf16 and the analysis scripts are single-GPU;
+the published run used one H100 80 GB. On any other card the first question is whether the
+model fits at all, and up to what context length.
 
-Referência medida:
-  4x L4  (g6.12xlarge,  ~22 GB/card): 20B NÃO cabe em card nenhum. 7B vai só até 8k.
-  4x L40S (g6e.12xlarge, ~48 GB/card): 40 GB de pesos + ativação — o single-GPU volta a ser
-    plausível, mas fica APERTADO em 32k (a doc de infra do projeto já marcava isso). Se A
-    passar em 32k, é o caminho: nada de fatiamento, idêntico ao desenho do artigo.
+Each strategy runs in a **separate process**. That is not fastidiousness: a load that fails
+with OOM leaves the partial model referenced by the traceback, the VRAM does not come back
+with `gc.collect()`/`empty_cache()`, and the next strategy spills onto another GPU. A
+subprocess is the only guarantee of clean VRAM.
 
-Cada estratégia roda em **processo separado**. Isso não é zelo: um carregamento que falha
-por OOM deixa o modelo parcial referenciado no traceback, a VRAM não volta com
-`gc.collect()`/`empty_cache()`, e a estratégia seguinte transborda para outra GPU — foi
-exatamente assim que o teste do 7B falhou com "two devices, cuda:0 and cuda:1" numa versão
-anterior deste script. Subprocesso é a única garantia de VRAM limpa.
+Single-GPU strategies run with CUDA_VISIBLE_DEVICES=0, so that a "success" cannot be a
+disguised spill onto a second card.
 
-As estratégias single-GPU rodam com CUDA_VISIBLE_DEVICES=0, para que um "sucesso" não seja
-na verdade um vazamento silencioso para os outros cards.
+Strategies:
+  A) 20B single-GPU           the published path; needs a >= 80 GB card
+  B) 20B via accelerate       device_map sharding; fails on StripedHyena, which does not
+                              route all data through forward signatures
+  C) 7B single-GPU            fits on smaller cards, but only up to short contexts
+  D) 7B via accelerate        same caveat as B
+  E) 20B manual pipeline      explicit block-level sharding (evo2_compat.shard_pipeline);
+                              works but is sequential and slow. Prefer A.
 
-Estratégias:
-  A) 20B single-GPU           — FALHA no L4 (40 GB de pesos em 22 GB úteis). Confirmado.
-  B) 20B via accelerate       — CARREGA, mas o forward morre com device misto: o
-                                dispatch_model pressupõe que todo dado passa pelas
-                                assinaturas de forward, e o StripedHyena não satisfaz isso.
-  C) 7B single-GPU            — funciona até 8k de contexto; OOM em 16k.
-  D) 7B via accelerate        — mesma dúvida de B.
-  E) 20B pipeline manual      — fatiamento explícito pelos blocos (evo2_compat.shard_pipeline).
-  F) 7B pipeline manual       — idem, para chegar a 32k no 7B.
-
-Uso:
-    python 00_preflight.py --weights-local /mnt/.../weights --out out/preflight_report.json
-    python 00_preflight.py --only C --weights-local ...     # uma estratégia só
+Usage:
+    python 00_preflight.py --weights-local <WEIGHTS> --out out/preflight_report.json
+    python 00_preflight.py --only C --weights-local ...     # a single strategy
 """
 import os, sys, json, time, argparse, subprocess, traceback
 
@@ -42,9 +34,9 @@ STRATEGIES = {"A": ("A_20b_single", "evo2_20b", "single"),
               "D": ("D_7b_sharded", "evo2_7b", "sharded"),
               "E": ("E_20b_pipeline", "evo2_20b", "pipeline"),
               "F": ("F_7b_pipeline", "evo2_7b", "pipeline")}
-# D existe porque o 7B num L4 só sozinho satura em 8k de contexto (pico 16,8 GB de 22),
+# D exists because the 7B alone on a small card saturates at 8k context,
 # e o artigo usa janela de 32k. Fatiado, os pesos ocupam ~3,5 GB por card e sobra muito
-# mais espaço para ativação — é o caminho mais provável para chegar a 32k nesta máquina.
+# and sharding frees activation space, which is the likelier route to 32k there.
 
 
 def log(*a):
@@ -70,7 +62,7 @@ def gpu_inventory():
 
 
 def ctx_probe(model, device, lengths=(4096, 8192, 16384, 32768)):
-    """Pico de memória por comprimento de contexto. Para no primeiro erro."""
+    """Peak memory by context length. Stops at the first error."""
     import torch
     out = {}
     seq = "ACGT" * (max(lengths) // 4 + 1)
@@ -113,7 +105,7 @@ def run_one(model_name, mode, weights_local, use_fp8):
             M._orig_get_data = M.pkgutil.get_data
         _o = M._orig_get_data
         M.pkgutil.get_data = lambda p, r: patched if (p == M.__name__ and r == res) else _o(p, r)
-        log("FP8 DESLIGADO por --no-fp8 (embeddings NÃO comparáveis aos cacheados)")
+        log("FP8 DISABLED by --no-fp8 (embeddings NOT comparable with the cached ones)")
     from evo2 import Evo2
 
     t0 = time.time()
@@ -144,9 +136,9 @@ def run_one(model_name, mode, weights_local, use_fp8):
         dmap = infer_auto_device_map(inner, max_memory=mm, dtype=torch.bfloat16,
                                      no_split_module_classes=ns)
         n_off = sum(1 for v in dmap.values() if v in ("cpu", "disk"))
-        log(f"    device_map: {len(set(dmap.values()))} devices, {n_off} módulos fora da GPU")
+        log(f"    device_map: {len(set(dmap.values()))} devices, {n_off} modules off-GPU")
         if n_off:
-            raise RuntimeError(f"device_map jogou {n_off} módulos para CPU/disk — não cabe")
+            raise RuntimeError(f"device_map put {n_off} modules on CPU/disk: does not fit")
         m.model = dispatch_model(inner, device_map=dmap)
         dev = "cuda:0"
         extra = {"n_devices": len(set(map(str, dmap.values())))}
@@ -154,10 +146,10 @@ def run_one(model_name, mode, weights_local, use_fp8):
     log(f"  carregou em {load_s}s — sondando contexto")
     ctx = ctx_probe(m, dev)
     res = {"loaded": True, "load_seconds": load_s, "fp8": fp8, "context": ctx, **extra}
-    # se falhou por device misto, o mapa de devices é o que permite consertar
+    # on a mixed-device failure, the device map is what makes it fixable
     if any((not v.get("ok")) and "same device" in v.get("error", "") for v in ctx.values()):
         res["device_map_dump"] = describe_devices(m.model)
-        log("  device misto — mapa por módulo:", json.dumps(res["device_map_dump"], indent=1))
+        log("  mixed devices, per-module map:", json.dumps(res["device_map_dump"], indent=1))
     return res
 
 
@@ -167,16 +159,16 @@ def main():
                     help="Caminho do .pt OU raiz que contenha <model>/<model>.pt.")
     ap.add_argument("--out", default="preflight_report.json")
     ap.add_argument("--only", default=None, choices=list(STRATEGIES),
-                    help="Roda uma estratégia só (usado internamente pelos subprocessos).")
+                    help="Run a single strategy (used internally by the subprocesses).")
     ap.add_argument("--no-fp8", action="store_true",
-                    help="Desliga FP8. Só para diagnóstico — bf16 muda os embeddings (Tabela S1).")
+                    help="Disable FP8. Diagnosis only: bf16 changes the embeddings (Supplementary Table S3).")
     ap.add_argument("--child-out", default=None, help="Uso interno.")
     a = ap.parse_args()
 
-    # ---- modo filho: uma estratégia, um processo
+    # ---- child mode: one strategy, one process
     if a.only:
         label, model_name, mode = STRATEGIES[a.only]
-        log(f"--- estratégia {label} ({model_name}, {mode}) ---")
+        log(f"--- strategy {label} ({model_name}, {mode}) ---")
         try:
             res = run_one(model_name, mode, a.weights_local, not a.no_fp8)
         except Exception as e:
@@ -186,9 +178,9 @@ def main():
         json.dump(res, open(a.child_out, "w"), indent=1)
         return
 
-    # ---- modo pai: inventário + um subprocesso por estratégia
+    # ---- parent mode: inventory + one subprocess per strategy
     rep = {"inventory": gpu_inventory(), "strategies": {}}
-    log("inventário:", json.dumps(rep["inventory"], indent=1))
+    log("inventory:", json.dumps(rep["inventory"], indent=1))
     if not rep["inventory"]["cuda_available"]:
         log("sem CUDA — abortando"); json.dump(rep, open(a.out, "w"), indent=1); return
 
@@ -199,7 +191,7 @@ def main():
         env = dict(os.environ)
         env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
         if mode == "single":
-            # trava em 1 GPU: um "sucesso" não pode ser vazamento para os outros cards
+            # pin to one GPU: a "success" must not be a spill onto the other cards
             env["CUDA_VISIBLE_DEVICES"] = "0"
         cmd = [sys.executable, os.path.abspath(__file__), "--only", key,
                "--child-out", child]
@@ -216,7 +208,7 @@ def main():
         else:
             rep["strategies"][label] = {"loaded": False,
                                         "error": f"subprocesso morreu (exit {p.returncode}) "
-                                                 f"sem escrever resultado — provável OOM do "
+                                                 f"without writing a result, likely an OOM of the "
                                                  f"kernel ou crash nativo"}
 
     ok = {L: [k for k, v in rep["strategies"].items()
@@ -225,9 +217,9 @@ def main():
     rep["verdict"] = {
         "usable_at_4k": ok[4096], "usable_at_32k": ok[32768],
         "recommended": ok[32768][0] if ok[32768] else None,
-        "note": ("Rodar 01/02 com --model conforme 'recommended'. Se só C_7b_single passar, "
+        "note": ("Run 01/02 with --model as in 'recommended'. If only C_7b_single passes, "
                  "as claims de arquitetura ficam demonstradas no 7B e o 20B espera hardware "
-                 "com >= 80 GB numa GPU só. Se B falhar por falta de accelerate, "
+                 "use a single GPU with >= 80 GB. If B fails for lack of accelerate, "
                  "`pip install accelerate` e rodar de novo.")}
     log("VEREDITO:", json.dumps(rep["verdict"], indent=1))
     json.dump(rep, open(a.out, "w"), indent=1)

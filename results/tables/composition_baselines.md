@@ -8,7 +8,7 @@ Representations (dimensionality): `Evo 2`=8192, `ORF`=12, `compo_all`=5516, `mul
 
 ORF feature set: `n_orfs_per_kb`, `log_longest_orf`, `orf_coverage`, `mean_orf_len`, `sd_orf_len`, `log_len`, `stop_dens_f0`, `stop_dens_f1`, `stop_dens_f2`, `stop_dens_f3`, `stop_dens_f4`, `stop_dens_f5`.
 
-> Coverage note: k>6 nao rodado: 16.384+ dims dominariam o custo sem acrescentar ao argumento, ja que dicodon cobre a mesma escala com quadro de leitura.
+> Coverage note: k>6 not run: 16,384+ dims would dominate the cost without adding to the argument, since dicodon covers the same scale with reading frame.
 
 
 ## Table R1-G. A. Pre-registered scheme (95% identity clusters)
@@ -43,7 +43,7 @@ R² per representation. Best baseline per row in bold.
 
 ## Evo 2 vs the best baseline, **by baseline class**
 
-R1 3.4 pede baselines de COMPOSICAO. Um scan de ORF nao e composicao: e uma versao simplificada do pipeline de anotacao que produziu os alvos, entao as duas classes sao reportadas separadas. codon/dicodon entram na classe composicional apesar de exigirem um scan de 6 quadros para definir quadro de leitura -- escolha conservadora, que fortalece a classe composicional.
+R1 3.4 asks for COMPOSITION baselines. An ORF scan is not composition: it is a simplified version of the annotation pipeline that produced the targets, so the two classes are reported separately. codon/dicodon count as compositional despite needing a six-frame scan: that is the conservative choice, and it strengthens the compositional class.
 
 
 ### compositional baselines (k-mer, codon, dicodon, GC+length)

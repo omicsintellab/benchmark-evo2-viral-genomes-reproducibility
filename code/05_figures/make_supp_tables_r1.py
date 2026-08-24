@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""make_supp_tables_r1.py — as três tabelas suplementares novas da revisão R1.
+"""make_supp_tables_r1.py — the supplementary tables added in revision R1.
 
-Lê apenas JSON cacheado; nenhum valor é digitado à mão. Saída em
-`results/tables/supp_S5_S7.md`, pronta para colar no material suplementar.
+Reads cached JSON only; no value is typed by hand. Output goes to results/tables/.
 
-  S5 — CV agrupado por família: os 6 contrastes primários sob os dois esquemas (R1 3.2, R2 #1/#2)
-  S6 — Evo 2 contra o melhor baseline de CADA CLASSE, nos dois esquemas (R1 3.4, R2 #3)
-  S7 — Classificação além da acurácia: macro-F1 e acurácia balanceada (R2 #15)
+  S5 — family-grouped CV: the six primary contrasts under both schemes (R1 3.2, R2 #1/#2)
+  S6 — Evo 2 versus the strongest baseline of each class (R1 3.4, R2 #3)
+  S7 — classification beyond accuracy: macro-F1 and balanced accuracy (R2 #15)
 
-Os IC vêm da inversão da estatística de Nadeau-Bengio, não do bootstrap — ver
-`code/03_analysis/ci_consistency.py` e PLANO §8-quater.1-bis.
+Intervals come from inverting the Nadeau-Bengio statistic, not from the bootstrap: see
+ci_consistency.py.
 
-Uso: python code/05_figures/make_supp_tables_r1.py
+Usage:
+    python code/05_figures/make_supp_tables_r1.py
 """
 import os, json
 

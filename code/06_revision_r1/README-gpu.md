@@ -33,51 +33,24 @@ python 00_preflight.py --weights-local <WEIGHTS> --out out/preflight_report.json
 `--weights-local` accepts either the `.pt` file or a root containing `<model>/<model>.pt`.
 Read `verdict.recommended` from the JSON, then run 01/02 with that model.
 
-## Estado: esperando uma GPU única de ≥80 GB (`p5`)
+## Hardware
 
-Duas máquinas multi-GPU foram tentadas e **abandonadas**. Rode numa `p5` (H100 80 GB), que é
-o hardware do artigo: aí o caminho single-GPU funciona e **não se usa `--pipeline`**.
+The published run used a **single H100 80 GB**, and that is the configuration to reproduce.
+The 20B checkpoint is ~40 GB in bf16 and the paper embeds 32,768-bp windows; smaller cards do
+not fit the model at that context, and multi-GPU sharding — attempted on 4× L4 and 4× L40S —
+was abandoned: `accelerate.dispatch_model` fails on StripedHyena (`Expected all tensors to be
+on the same device`), and the manual pipeline sharding in `evo2_compat.shard_pipeline` is
+sequential, at 75–77 s per generation. That helper is kept for reference and is **untested**;
+prefer the single-GPU path, which is what `00_preflight.py` verifies.
 
-| Máquina | 20B | 7B |
-|---|---|---|
-| 4× L4 (`g6.12xlarge`, 22 GB/card) | não carrega em card nenhum | só até 8k |
-| 4× L40S (`g6e.12xlarge`, 44,5 GB/card) | single só até **4k**; fatiado até **16k**, OOM em 32k | 32k OK |
+FP8 is not an obstacle on any of these cards (all are compute capability ≥ 8.9) and
+`patch_fp8` keeps it on, so embeddings stay comparable to the cached ones. `--no-fp8` exists
+for diagnosis only: bf16 changes the embeddings measurably (Supplementary Table S3) and would
+have to be declared.
 
-O artigo usa janela de 32k, então o embaralhamento de blocos no 20B não fecha em nenhuma das
-duas. A geração (5.120 tokens) **rodou** no 20B fatiado e passou no controle positivo, mas a
-75–77 s por geração — o fatiamento em pipeline é sequencial, só uma GPU trabalha por vez, e
-batching não ajuda porque o trabalho por hop cresce com o lote. Corrida cheia: 25 h.
-
-**Vale para a `p5` também:** `generate()` vaza estado entre chamadas (cache de inferência
-preso ao modelo; a GPU 0 chegou a 39,5 GiB com ~12 GiB de pesos). Isso derruba corridas longas
-em qualquer hardware. Já corrigido em `02_generation_rerun.py`.
-
-## What we learned on 4× NVIDIA L4 (`g6.12xlarge`), August 2026
-
-This configuration was tried because no ≥80 GB instance was available. **It does not work for
-the 20B**, and the attempt was stopped. Recorded here so nobody repeats it:
-
-| Strategy | Result |
-|---|---|
-| 20B, single GPU | **OOM on load.** Each L4 exposes 21.95 GiB usable; weights are ~40 GB. |
-| 20B, `accelerate.dispatch_model` | **Loads** (40 GB does fit across 88 GB) but the forward dies: `Expected all tensors to be on the same device`. |
-| 7B, single GPU | Works to **8k context** (peak 16.78 GB); OOM at 16k. The paper uses 32k windows. |
-| 20B/7B, manual pipeline sharding | Implemented (`evo2_compat.shard_pipeline`) but **never validated** — the run was stopped first. Treat as untested. |
-
-Why `dispatch_model` fails: it installs hooks that move each submodule's *inputs* to that
-submodule's device, which assumes all data flow passes through `forward` signatures.
-StripedHyena does not satisfy that assumption. `shard_pipeline` was written to sidestep it by
-splitting the block list explicitly and moving the hidden state by hand, but it rests on the
-assumption that only the hidden state crosses blocks — if any tensor is held as a loose
-attribute (neither parameter nor registered buffer), it will not move. `describe_devices`
-exists to locate exactly that, should anyone pick this up again.
-
-**On a single ≥80 GB GPU none of this is needed** — the single-GPU path is the one the paper
-used and the one to prefer.
-
-FP8 is not the obstacle: L4, L40S and H100 are all cc ≥ 8.9 and `patch_fp8` keeps FP8 on, so
-embeddings stay comparable to the cached ones. `--no-fp8` exists for diagnosis only; bf16
-changes the embeddings measurably (see Supplementary Table S1) and would have to be declared.
+One bug worth knowing about, already fixed in `02_generation_rerun.py`: `model.generate()`
+leaks state between calls — the inference cache stays attached to the model object and grows
+until the GPU runs out of memory on a long run.
 
 ## Scratch space
 

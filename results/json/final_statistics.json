@@ -1,7 +1,7 @@
 {
  "design": {
   "primary_scheme": "cl95",
-  "primary_scheme_rationale": "Esquema PRE-REGISTRADO (corpus_design.yaml: dedup min_seq_id 0.95, split cluster_aware). Agrupar por familia responde outra pergunta (independencia taxonomica) e nao era o desenho fixado antes dos dados; promove-lo a principal seria a mesma selecao pos-hoc que R1 3.5 critica.",
+  "primary_scheme_rationale": "PRE-REGISTERED scheme (corpus_design.yaml: dedup min_seq_id 0.95, split cluster_aware). Grouping by family answers a different question (taxonomic independence) and was not the design fixed before the data; promoting it to primary would be the same post-hoc selection R1 3.5 criticises.",
   "primary_set": [
    "coding_fraction",
    "gene_density",
@@ -11,15 +11,15 @@
    "overlap_bp"
   ],
   "contrast": "evo2_20b_blocks18 vs 6mer",
-  "test": "t reamostrado corrigido (Nadeau & Bengio, 2003), fator (1/n + 1/(k-1))",
-  "correction": "Holm dentro do conjunto primario de 6",
-  "ci": "IC obtido invertendo a MESMA estatistica corrigida do teste (ver ci_consistency.json); o bootstrap sobre diferencas por fold trata os folds como independentes e foi abandonado",
+  "test": "corrected resampled t-test (Nadeau & Bengio, 2003), factor (1/n + 1/(k-1))",
+  "correction": "Holm within the primary set of six",
+  "ci": "obtained by inverting the SAME corrected statistic as the test (see ci_consistency.json); the bootstrap over per-fold differences treats those folds as independent and was abandoned",
   "negative_control": [
    "cpg_oe",
    "upa_oe"
   ],
-  "negative_control_note": "Alvos de composicao de dinucleotideo, declarados ANTES como casos em que se espera que o 6-mer ven\u00e7a. Nao sao testes de hipotese: sao controle de especificidade do probe. FORA da correcao.",
-  "exploratory": "Baseline GC+len; classificacao de Baltimore/hospedeiro/familia; varredura de camadas; 20B vs 7B; controle de precisao; controle de PCA; CV aleatoria; avaliacao de geracao. Reportados com IC, sem p confirmatorio.",
+  "negative_control_note": "Dinucleotide-composition targets, declared IN ADVANCE as cases where the 6-mer baseline is expected to win. These are not hypothesis tests but a a specificity check on the probe. OUTSIDE the correction.",
+  "exploratory": "GC-and-length baseline; Baltimore/host/family classification; layer sweep; 20B versus 7B; precision control; PCA control; random CV; the whole generative evaluation. Reported with intervals, without confirmatory p-values.",
   "baseline_classes": {
    "compositional": [
     "kmer3",

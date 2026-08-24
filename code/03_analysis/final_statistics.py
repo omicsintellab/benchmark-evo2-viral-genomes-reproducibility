@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
-"""final_statistics.py — a estatística final da revisão (R1 3.5, R2 #6).
+"""final_statistics.py — the final statistics of the revision (R1 3.5, R2 #6).
 
-Não recomputa CV nenhuma: lê os scores de fold já cacheados em
-`family_cv_metrics.json` e `composition_baselines_metrics.json` e produz o bloco
-estatístico definitivo. Isso importa porque o esquema PRIMÁRIO mudou depois das corridas
-(voltou a ser o pré-registrado `cl95`, ver PLANO §4.4-bis) e os scores dos quatro esquemas
-já estavam salvos — refazer a CV seria desperdício e introduziria variação de semente.
+Recomputes no cross-validation: it reads the per-fold scores already cached in
+`family_cv_metrics.json` and `composition_baselines_metrics.json` and produces the definitive
+statistical block. This matters because the PRIMARY scheme changed after the runs (back to the
+pre-registered `cl95`) while the scores of all schemes were already saved; re-running the
+cross-validation would be wasted compute and would introduce seed variation.
 
-O que os revisores pedem e sai daqui:
-  - R1 3.5 / R2 #6: teste apropriado para CV repetida (Nadeau-Bengio, que corrige a
-    variância pelo fator (1/n + n_test/n_train)), com IC bootstrap e tamanho de efeito
-    ao lado do p, e correção de comparações múltiplas dentro de um conjunto primário
-    pequeno e declarado.
-  - Conjunto primário: 6 contrastes Evo 2 20B blocks.18 vs 6-mer, sob `cl95`.
-  - Controle negativo pré-declarado (cpg_oe/upa_oe), FORA da correção.
-  - Sensibilidade: os mesmos contrastes sob agrupamento por família.
+What the reviewers ask for and what comes out of here:
+  - R1 3.5 / R2 #6: a test appropriate for repeated cross-validation (Nadeau-Bengio, which
+    inflates the variance by (1/n + n_test/n_train)), with an interval and an effect size
+    beside every p-value, and multiple-comparison correction inside a small, declared primary
+    set.
+  - Primary set: six contrasts, Evo 2 20B blocks.18 versus 6-mer, under `cl95`.
+  - Pre-declared negative control (cpg_oe, upa_oe), OUTSIDE the correction.
+  - Sensitivity: the same contrasts under family grouping.
 
-Uso:
+Note on intervals: the intervals reported in the paper come from `ci_consistency.py`, which
+inverts the same corrected statistic as the test. The bootstrap over per-fold differences was
+abandoned because it treats those folds as independent.
+
+Usage:
     python final_statistics.py --out ../../results/json
 """
 import os, sys, json, argparse
@@ -30,7 +34,7 @@ ROOT = os.path.join(HERE, "..", "..")
 
 
 def cohens_d(a, b):
-    """Tamanho de efeito para observações pareadas (d de Cohen para diferenças)."""
+    """Effect size for paired observations (Cohen's d over the differences)."""
     d = np.asarray(a) - np.asarray(b)
     sd = d.std(ddof=1)
     return float(d.mean() / sd) if sd > 0 else float("nan")
@@ -59,29 +63,29 @@ def main():
     out = {"design": {
         "primary_scheme": "cl95",
         "primary_scheme_rationale":
-            "Esquema PRE-REGISTRADO (corpus_design.yaml: dedup min_seq_id 0.95, "
-            "split cluster_aware). Agrupar por familia responde outra pergunta "
-            "(independencia taxonomica) e nao era o desenho fixado antes dos dados; "
-            "promove-lo a principal seria a mesma selecao pos-hoc que R1 3.5 critica.",
+            "PRE-REGISTERED scheme (corpus_design.yaml: dedup min_seq_id 0.95, "
+            "split cluster_aware). Grouping by family answers a different question "
+            "(taxonomic independence) and was not the design fixed before the data; "
+            "promoting it to primary would be the same post-hoc selection R1 3.5 criticises.",
         "primary_set": [n for n, _ in PRIMARY],
         "contrast": f"{EVO} vs {KMER}",
-        "test": "t reamostrado corrigido (Nadeau & Bengio, 2003), fator (1/n + 1/(k-1))",
-        "correction": "Holm dentro do conjunto primario de 6",
-        "ci": "IC obtido invertendo a MESMA estatistica corrigida do teste "
-               "(ver ci_consistency.json); o bootstrap sobre diferencas por fold trata os "
-               "folds como independentes e foi abandonado",
+        "test": "corrected resampled t-test (Nadeau & Bengio, 2003), factor (1/n + 1/(k-1))",
+        "correction": "Holm within the primary set of six",
+        "ci": "obtained by inverting the SAME corrected statistic as the test "
+               "(see ci_consistency.json); the bootstrap over per-fold differences treats "
+               "those folds as independent and was abandoned",
         "negative_control": [n for n, _ in NEGCTRL],
         "negative_control_note":
-            "Alvos de composicao de dinucleotideo, declarados ANTES como casos em que se "
-            "espera que o 6-mer vença. Nao sao testes de hipotese: sao controle de "
-            "especificidade do probe. FORA da correcao.",
+            "Dinucleotide-composition targets, declared IN ADVANCE as cases where "
+            "the 6-mer baseline is expected to win. These are not hypothesis tests but a "
+            "a specificity check on the probe. OUTSIDE the correction.",
         "exploratory":
-            "Baseline GC+len; classificacao de Baltimore/hospedeiro/familia; varredura de "
-            "camadas; 20B vs 7B; controle de precisao; controle de PCA; CV aleatoria; "
-            "avaliacao de geracao. Reportados com IC, sem p confirmatorio.",
+            "GC-and-length baseline; Baltimore/host/family classification; layer "
+            "sweep; 20B versus 7B; precision control; PCA control; random CV; "
+            "the whole generative evaluation. Reported with intervals, without confirmatory p-values.",
     }, "primary": {}, "sensitivity_family": {}, "negative_control": {}}
 
-    # ---- primário: cl95
+    # ---- primary: cl95
     pv, names = [], []
     for name, _ in PRIMARY:
         r = fam["targets"][name]["reps"]
@@ -94,7 +98,7 @@ def main():
         out["primary"][name]["significant_holm"] = bool(adj[name] < 0.05 and
                                                         out["primary"][name]["delta"] > 0)
 
-    # ---- sensibilidade: mesmos contrastes sob agrupamento por família
+    # ---- sensitivity: the same contrasts under family grouping
     pv2 = []
     for name, _ in PRIMARY:
         r = fam["targets"][name]["reps"]
@@ -105,7 +109,7 @@ def main():
     for name in names:
         out["sensitivity_family"][name]["p_holm"] = adj2[name]
 
-    # ---- controle negativo, sem correção
+    # ---- negative control, no correction
     for name, _ in NEGCTRL:
         r = fam["targets"][name]["reps"]
         out["negative_control"][name] = {
@@ -113,7 +117,7 @@ def main():
             "family": contrast(r[EVO]["family"]["scores"], r[KMER]["family"]["scores"],
                                EVO, KMER)}
 
-    # ---- baseline mais forte por classe (etapa 3), se disponível
+    # ---- strongest baseline per class, when available
     if comp:
         out["vs_best_baseline_by_class"] = {
             sch: {t: {cls: {k: v[k] for k in ("best", "best_r2", "delta", "ci95", "p",
@@ -137,7 +141,7 @@ def main():
     print("-- PRIMARIO (cl95, pre-registrado), p corrigido por Holm " + "-" * 18)
     for n in names:
         row(n, out["primary"][n], "p_holm")
-    print("-- SENSIBILIDADE (agrupado por familia), p Holm " + "-" * 27)
+    print("-- SENSITIVITY (family-grouped), Holm-corrected p " + "-" * 22)
     for n in names:
         row(n, out["sensitivity_family"][n], "p_holm")
     print("-- CONTROLE NEGATIVO (fora da correcao), p bruto " + "-" * 26)

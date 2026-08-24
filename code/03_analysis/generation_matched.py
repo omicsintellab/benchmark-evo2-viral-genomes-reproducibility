@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
-"""generation_matched.py — euk held-out vs fago, ajustado e pareado (R2 #11).
+"""generation_matched.py — held-out eukaryotic viruses versus phages, adjusted and matched (R2 #11).
 
-R2 #11: "a comparação generativa não isola o efeito da exposição ao pré-treino. Fagos e
-vírus de eucariotos diferem em tipo de genoma, comprimento, GC, densidade codificante,
-segmentação e diversidade taxonômica. A diferença em bits por nucleotídeo não deveria ser
-atribuída apenas à inclusão no treino. Uma análise pareada ou ajustada seria mais
-convincente, e o termo 'seen bacteriophages' deve ser evitado a menos que a sobreposição
-exata com o conjunto de treino tenha sido verificada."
+R2 #11 notes that the generative comparison does not isolate the effect of pre-training
+exposure: phages and eukaryotic viruses differ in genome type, length, GC, coding density,
+segmentation and taxonomic diversity, so the difference in bits per nucleotide should not be
+attributed to training inclusion alone. A matched or adjusted analysis would be more
+convincing, and the term "seen bacteriophages" should be avoided unless exact overlap with the
+training set has been verified.
 
-Três análises, da mais ingênua à mais defensável:
-  1) bruta          — diferença de médias, que é o que o artigo reporta hoje
-  2) ajustada       — OLS com log(comprimento), GC, fração codificante e classe de Baltimore
-  3) pareada        — vizinho mais próximo em log(comprimento) e GC, sem reposição
+Three analyses, from the most naive to the most defensible:
+  1) crude     — difference of means, which is what the original submission reported
+  2) adjusted  — OLS on log(length), GC, coding fraction and Baltimore class
+  3) matched   — nearest neighbour on log(length) and GC, without replacement
 
-Se a diferença sobreviver a (2) e (3), ela não é explicada pelas covariáveis que o revisor
-lista. Se encolher muito, o artigo tem de dizer isso — que é o desfecho que R2 #11 antecipa.
+If the difference survives (2) and (3), exposure remains a plausible explanation; if it
+shrinks, genome properties explain part of it and the claim must be narrowed.
 
-**Sobre nomenclatura:** não temos verificação de sobreposição exata com o corpus de treino do
-Evo 2. O script emite o alerta e o texto deve trocar "seen bacteriophages" por algo como
-"bacteriophages, a group represented in the pre-training corpus".
-
-Uso:
-    python generation_matched.py --perp <csv> --comp <csv> --out ../../results/json
+Usage:
+    PYTHONPATH=<repo>/code/03_analysis python generation_matched.py \
+        --perplexity <csv> --completion <csv> --out ../../results/json
 """
 import os, sys, json, argparse
 import numpy as np
@@ -49,7 +46,7 @@ def load(perp, comp):
 
 
 def describe_imbalance(df):
-    """Quão diferentes são os dois grupos NAS COVARIÁVEIS — é o cerne da objeção."""
+    """How different the two groups are IN THE COVARIATES, which is the core of the objection."""
     out = {}
     for c in COVARS + ["genome_length"]:
         a = df.loc[df.is_phage == 0, c].astype(float)
@@ -76,7 +73,7 @@ def adjusted(df, y):
 
 
 def matched(df, y, seed=42):
-    """Pareamento 1:1 por vizinho mais próximo em (log_len, GC) padronizados, sem reposição."""
+    """1:1 nearest-neighbour matching on standardised (log_len, GC), without replacement."""
     from scipy.spatial import cKDTree
     from scipy import stats
     a = df[df.is_phage == 0].copy()
@@ -136,7 +133,7 @@ def main():
               f"(p={out['outcomes'][y]['matched']['p']:.2g}, "
               f"n={out['outcomes'][y]['matched']['n_pairs']} pares)")
 
-    print("\n  desequilíbrio de covariáveis (diferença padronizada; |d|>0,25 = relevante):")
+    print("\n  covariate imbalance (standardised difference; |d| > 0.25 is material):")
     for c, v in out["covariate_imbalance"].items():
         print(f"    {c:<18} euk={v['euk_mean']:>10.3f} fago={v['phage_mean']:>10.3f} "
               f"d={v['std_diff']:+.2f}")

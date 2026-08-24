@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""classification_metrics.py — além da acurácia (R2 #15).
+"""classification_metrics.py — beyond accuracy (R2 #15).
 
-R2 #15: "acurácia sozinha é insuficiente para a tarefa de classificação de família. O número
-de famílias incluídas, o macro-F1, a acurácia balanceada e o recall por família devem ser
-reportados."
+R2 #15 notes that accuracy alone is insufficient for the family classification task, and asks
+for the number of families included, macro-F1, balanced accuracy and per-family recall.
 
-Reporta, para Baltimore, hospedeiro e família: acurácia, acurácia balanceada, macro-F1,
-F1 ponderado, e recall por classe, com o n de cada classe.
+Reports, for Baltimore class, host domain and family: accuracy, balanced accuracy, macro-F1,
+weighted F1, and per-class recall with the n of each class.
 
-Nota de desenho: para **família** o esquema `family` não existe — não se prevê uma família
-que nunca apareceu no treino. Família sai só sob o esquema pré-registrado `cl95`. Para
-Baltimore e hospedeiro os dois esquemas são reportados.
+Design note: for **family** the `family` scheme does not exist — one cannot predict a family
+never seen in training. Family is reported under the pre-registered `cl95` scheme only. For
+Baltimore class and host domain both schemes are reported.
 
-Uso:
-    PYTHONPATH=<repro>/code/03_analysis python classification_metrics.py --out ../../results/json
+Usage:
+    PYTHONPATH=<repo>/code/03_analysis python classification_metrics.py --out ../../results/json
 """
 import os, sys, json, argparse
 import numpy as np
@@ -38,7 +37,7 @@ def clf_pipe():
 
 
 def oof_predictions(X, y, g, reps=REPEATS):
-    """Predições out-of-fold com grupos preservados. Empilha as repetições."""
+    """Out-of-fold predictions with groups preserved. Stacks the repeats."""
     rng = np.random.default_rng(SEED)
     yt, yp = [], []
     uniq = np.unique(g)
@@ -85,19 +84,19 @@ def main():
     X20 = X20.astype(np.float32)
     KM = kmer_matrix(list(accs))
     g95 = cl95_groups(accs)
-    fam = md["family"].fillna("<sem familia>").values.astype(str)
+    fam = md["family"].fillna("<no family>").values.astype(str)
 
     out = {"config": {"splits": SPLITS, "repeats": REPEATS, "seed": SEED,
                       "min_family_n": MIN_FAMILY_N,
                       "note_family_scheme":
-                          "Familia nao e avaliada sob agrupamento por familia: nao se preve "
-                          "uma classe ausente do treino. So o esquema pre-registrado cl95."},
+                          "Family is not evaluated under family grouping: one cannot predict "
+                          "a class absent from training. The pre-registered cl95 scheme only."},
            "targets": {}}
 
-    # As populações têm de ser as MESMAS do artigo, senão as métricas novas não são
-    # comparáveis à Tabela publicada. Baltimore usa o subconjunto de 981; hospedeiro e
-    # família usam o de 1.200. Sem isso, os 240 records com baltimore "?" entram como uma
-    # oitava classe e o n vira 1.912 — foi o que aconteceu na primeira versão deste script.
+    # The populations must be the SAME as in the paper, otherwise the new metrics are not
+    # comparable with the published table. Baltimore uses the 981-record subset; host domain
+    # and family use the 1,200-record one. Without this, the 240 records with baltimore "?"
+    # enter as an eighth class and n becomes 1,912, which is what an earlier version did.
     balt_accs = set(pd.read_csv(a.subset_baltimore, sep="\t")["accession"].astype(str))
     feat_accs = set(pd.read_csv(a.subset_features, sep="\t")["accession"].astype(str))
     in_balt = np.array([x in balt_accs for x in accs])
@@ -109,13 +108,13 @@ def main():
     tasks.append(("baltimore", m, md["baltimore"].values, ["cl95", "family"]))
     m = in_feat & md["host"].isin(["eukaryote", "bacteria", "archaea"]).values
     tasks.append(("host", m, md["host"].values, ["cl95", "family"]))
-    # Família: subconjunto de features, só as bem representadas, e só cl95
+    # Family: feature subset, well-represented families only, and cl95 only
     vc = md.loc[in_feat, "family"].value_counts()
     keep_f = vc[vc >= MIN_FAMILY_N].index
     m = in_feat & md["family"].isin(keep_f).values
     tasks.append(("family", m, md["family"].values, ["cl95"]))
-    print(f"populações: baltimore={tasks[0][1].sum()} host={tasks[1][1].sum()} "
-          f"family={tasks[2][1].sum()} ({len(keep_f)} famílias >= {MIN_FAMILY_N})")
+    print(f"populations: baltimore={tasks[0][1].sum()} host={tasks[1][1].sum()} "
+          f"family={tasks[2][1].sum()} ({len(keep_f)} families >= {MIN_FAMILY_N})")
 
     for name, mask, yall, schemes in tasks:
         y = np.asarray(yall)[mask].astype(str)
@@ -135,9 +134,9 @@ def main():
                       f"bal_acc={mm['balanced_accuracy']:.3f} macroF1={mm['macro_f1']:.3f}")
         out["targets"][name] = rec
 
-    # recall por família, ordenado — é o que R2 #15 pede nominalmente
+    # per-family recall, sorted: what R2 #15 asks for by name
     f = out["targets"]["family"]["reps"]["evo2_20b_blocks18"]["cl95"]["per_class_recall"]
-    print(f"\n--- recall por família (Evo 2, cl95; {len(f)} famílias) ---")
+    print(f"\n--- per-family recall (Evo 2, cl95; {len(f)} families) ---")
     for k, v in sorted(f.items(), key=lambda kv: -kv[1]["recall"]):
         print(f"  {k:<24} recall={v['recall']:.3f}  n={v['n']}")
 

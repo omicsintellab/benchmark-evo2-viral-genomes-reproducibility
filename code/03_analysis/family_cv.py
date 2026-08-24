@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
-"""family_cv.py — CV agrupado por FAMÍLIA e leave-one-family-out (revisão R1).
+"""family_cv.py — family-grouped cross-validation and leave-one-family-out (revision R1).
 
-Responde a R1 3.2 e R2 #1/#2: o clustering a 95% de identidade impede vazamento de
-quase-duplicatas, mas NÃO testa generalização para vírus evolutivamente distintos.
-Este script repete as análises principais sob agrupamento taxonômico e reporta os
-três esquemas lado a lado, para separar as duas coisas:
+Answers R1 3.2 and R2 #1/#2: clustering at 95% identity prevents near-duplicate leakage but
+does NOT test generalisation to evolutionarily distinct viruses. This script repeats the main
+analyses under taxonomic grouping and reports the schemes side by side, so the two questions
+stay separate:
 
-    random   — CV aleatória (o que o artigo reportou como principal)
-    cl95     — grupos = clusters MMseqs2 95% id / 85% cov (vazamento de quase-duplicata)
-    family   — grupos = família viral  (não-independência taxonômica)
-    LOFO     — leave-one-family-out nas famílias com n >= MIN_LOFO
+    random   — random cross-validation
+    cl95     — groups = MMseqs2 clusters, 95% id / 85% cov (near-duplicate leakage)
+    family   — groups = viral family (taxonomic non-independence)
+    LOFO     — leave-one-family-out over families with n >= MIN_LOFO
 
-População: os records do subset de features COM família conhecida. Os sem família
-não podem entrar num CV agrupado por família e são descartados da análise principal
-(a variante que os trata como grupos singleton sai com --with-singletons).
+Population: the records of the feature subset that have an assigned family. Records without one
+cannot enter a family-grouped scheme and are dropped from the main analysis; the variant that
+treats each of them as its own group is available with --with-singletons.
 
-Nota: agrupar por família **subsome** o agrupamento por organismo que R2 #4 pede —
-segmentos do mesmo vírus compartilham família, logo caem sempre no mesmo fold. O
-script verifica isso e aborta se a invariante não valer.
+Grouping by family **subsumes** the per-organism grouping requested in R2 #4: segments of the
+same virus share a family, so they always fall in the same fold. The script checks that
+invariant and aborts if it does not hold.
 
-Estatística (R1 3.5, R2 #6): as pontuações de folds de CV repetida não são
-independentes; o t pareado comum subestima a variância. Usamos o t reamostrado
-corrigido de Nadeau-Bengio, com correção de Holm dentro do conjunto primário de 6
-contrastes, e IC bootstrap do delta. cpg_oe/upa_oe são controle negativo
-pré-declarado (composição — espera-se que o 6-mer vença) e ficam FORA da correção.
+Statistics (R1 3.5, R2 #6): fold scores of repeated cross-validation are not independent, and a
+plain paired t-test understates the variance. We use the corrected resampled t-test of Nadeau
+and Bengio, with Holm correction inside the primary set of six contrasts. cpg_oe and upa_oe are
+a pre-declared negative control (dinucleotide composition — the 6-mer baseline is expected to
+win) and stay OUT of the correction.
 
-Uso:
+Usage:
     SCALE_DATA=<dir> SCALE_EMB20B=<dir> python code/03_analysis/family_cv.py [--out DIR]
 
 Entradas: manifest.parquet, features.parquet, all_genomes.fasta, cl95_cluster.tsv,
@@ -44,12 +44,12 @@ from scale_analysis import (DATA, load_20b, align, kmer_matrix, gclen, seqs_for,
                             groups as cl95_groups, SEED, SPLITS, REPEATS)
 from viral_features_extended import dinuc_oe
 
-# Conjunto PRIMÁRIO (confirmatório): 6 contrastes Evo2 20B blocks.18 vs 6-mer.
+# PRIMARY (confirmatory) set: six contrasts, Evo 2 20B blocks.18 versus 6-mer.
 PRIMARY = [("coding_fraction", False), ("gene_density", False), ("noncoding_bp", True),
            ("n_genes", True), ("mean_intergenic_len", True), ("overlap_bp", True)]
-# Controle negativo pré-declarado: composição de dinucleotídeo. FORA da correção.
+# Pre-declared negative control: dinucleotide composition. OUTSIDE the correction.
 NEGCTRL = [("cpg_oe", False), ("upa_oe", False)]
-MIN_LOFO = 30          # famílias com >= 30 genomas entram no leave-one-family-out
+MIN_LOFO = 30          # families with >= 30 genomes enter the leave-one-family-out
 ALPHAS = [1, 10, 100, 1000]
 
 
@@ -63,8 +63,8 @@ def reg_rand(X, y):
 
 
 def reg_group(X, y, g, reps=REPEATS):
-    """Mesma mecânica de scale_analysis.reg_group: permuta os grupos e os distribui
-    ciclicamente entre os folds, de modo que um grupo nunca se parte."""
+    """Same mechanics as scale_analysis.reg_group: permute the groups and deal them
+    round-robin across folds, so that a group is never split."""
     sc = []; rng = np.random.default_rng(SEED); uniq = np.unique(g)
     for r in range(reps):
         perm = {u: i for i, u in enumerate(rng.permutation(uniq))}
@@ -78,9 +78,9 @@ def reg_group(X, y, g, reps=REPEATS):
 
 
 def lofo(X, y, fam, fams):
-    """Leave-one-family-out. Devolve R² por família e o R² agregado sobre as
-    predições out-of-fold empilhadas (mais estável que a média dos R² por família,
-    que fica instável quando a variância dentro da família é pequena)."""
+    """Leave-one-family-out. Returns R² per family and the pooled R² over stacked
+    out-of-fold predictions, which is more stable than averaging per-family R²
+    when within-family variance is small."""
     per, yt, yp = {}, [], []
     for f in fams:
         te = fam == f; tr = ~te
@@ -93,8 +93,8 @@ def lofo(X, y, fam, fams):
 
 
 def nadeau_bengio(a, b, n_splits=SPLITS):
-    """t reamostrado corrigido (Nadeau & Bengio, 2003) para folds de CV repetida.
-    Corrige a variância pelo fator (1/n + n_test/n_train) = (1/n + 1/(k-1))."""
+    """Corrected resampled t-test (Nadeau & Bengio, 2003) for repeated-CV folds.
+    Inflates the variance by (1/n + n_test/n_train) = (1/n + 1/(k-1))."""
     d = np.asarray(a) - np.asarray(b); n = len(d)
     if n < 2: return float("nan"), float("nan")
     var = d.var(ddof=1)
@@ -112,7 +112,7 @@ def boot_ci(a, b, n=10000, seed=SEED):
 
 
 def holm(pvals, names):
-    """Holm-Bonferroni. Devolve {nome: p_ajustado}."""
+    """Holm-Bonferroni. Returns {name: adjusted_p}."""
     order = sorted(range(len(pvals)), key=lambda i: pvals[i])
     m = len(pvals); adj = [0.0] * m; run = 0.0
     for rank, i in enumerate(order):
@@ -127,10 +127,10 @@ def main():
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                   "..", "..", "results", "json"))
     ap.add_argument("--with-singletons", action="store_true",
-                    help="Inclui os records sem família como grupos singleton (sensibilidade).")
+                    help="Include records without a family as singleton groups (sensitivity analysis).")
     a = ap.parse_args()
 
-    # ---- 1. população -------------------------------------------------------
+    # ---- 1. population -------------------------------------------------------
     X20, acc20 = load_20b(18, "fp8")
     accs = acc20.astype(str)
     man = pd.read_parquet(f"{DATA}/manifest.parquet").set_index("accession")
@@ -143,12 +143,12 @@ def main():
 
     has_fam = md["family"].notna().values
     print(f"[family_cv] records com embedding: {len(accs)}")
-    print(f"[family_cv] com família: {has_fam.sum()} | sem família (descartados): {(~has_fam).sum()}")
+    print(f"[family_cv] with family: {has_fam.sum()} | without family (dropped): {(~has_fam).sum()}")
 
     if a.with_singletons:
         md["family"] = md["family"].fillna(pd.Series(accs, index=md.index))
         keep = np.ones(len(accs), bool)
-        print("[family_cv] modo --with-singletons: sem-família viram grupos próprios")
+        print("[family_cv] --with-singletons: records without a family become their own groups")
     else:
         keep = has_fam
 
@@ -156,25 +156,25 @@ def main():
     X20_k = X20.astype(np.float32)[keep]
     fam = md["family"].values.astype(str)
 
-    # invariante de R2 #4: família subsome organismo
+    # R2 #4 invariant: family subsumes organism
     bad = md.groupby("organism")["family"].nunique()
     bad = bad[bad > 1]
     if len(bad):
-        print(f"[ERRO] {len(bad)} organismos com mais de uma família — agrupar por família "
-              f"não protegeria os segmentos. Exemplos: {list(bad.index[:5])}")
+        print(f"[ERROR] {len(bad)} organisms map to more than one family; grouping by family "
+              f"would not protect segments. Examples: {list(bad.index[:5])}")
         sys.exit(1)
     nseg = (md.groupby("organism").size() > 1).sum()
-    print(f"[family_cv] invariante OK: família subsome organismo "
-          f"({nseg} organismos multi-record ficam sempre no mesmo fold)")
+    print(f"[family_cv] invariant OK: family subsumes organism "
+          f"({nseg} multi-record organisms always land in the same fold)")
 
-    # ---- 2. representações --------------------------------------------------
+    # ---- 2. representations --------------------------------------------------
     print("[family_cv] montando 6-mer e GC+len ...", flush=True)
     KM = kmer_matrix(accs_k.tolist())
     md["GC"] = fe.reindex(accs_k)["GC"].values
     md["genome_length"] = fe.reindex(accs_k)["genome_length"].values
     GL = gclen(md)
 
-    print("[family_cv] CpG/UpA o/e (controle negativo) ...", flush=True)
+    print("[family_cv] CpG/UpA o/e (negative control) ...", flush=True)
     seqs = seqs_for(accs_k.tolist())
     cu = [dinuc_oe(seqs.get(x, "")) for x in accs_k]
     md["cpg_oe"] = [c for c, _ in cu]; md["upa_oe"] = [u for _, u in cu]
@@ -184,7 +184,7 @@ def main():
 
     famsize = pd.Series(fam).value_counts()
     lofo_fams = famsize[famsize >= MIN_LOFO].index.tolist()
-    print(f"[family_cv] famílias: {famsize.size} | com >= {MIN_LOFO}: {len(lofo_fams)} "
+    print(f"[family_cv] families: {famsize.size} | with >= {MIN_LOFO}: {len(lofo_fams)} "
           f"({famsize[famsize >= MIN_LOFO].sum()} records)")
 
     # ---- 3. CV --------------------------------------------------------------
@@ -225,7 +225,7 @@ def main():
                   f"fam={s_fam.mean():.3f}  LOFO={pooled:.3f}", flush=True)
         out["targets"][name] = rec
 
-    # ---- 4. estatística: Evo2 vs 6-mer sob CV por família -------------------
+    # ---- 4. statistics: Evo 2 versus 6-mer under family-grouped CV ----------
     prim = [n for n, _ in PRIMARY]
     tests, pv = {}, []
     for name in prim:
@@ -242,7 +242,7 @@ def main():
     out["primary_tests"] = {"scheme": "family-grouped CV", "contrast": "evo2_20b_blocks18 vs 6mer",
                             "correction": "holm", "tests": tests}
 
-    # controle negativo, sem correção
+    # negative control, no correction
     neg = {}
     for name, _ in NEGCTRL:
         e = out["targets"][name]["reps"]["evo2_20b_blocks18"]["family"]["scores"]
@@ -250,7 +250,7 @@ def main():
         t, p = nadeau_bengio(e, k); lo, hi = boot_ci(e, k)
         neg[name] = {"delta_mean": float(np.mean(e) - np.mean(k)), "ci95": [lo, hi],
                      "t_nadeau_bengio": t, "p_raw": p}
-    out["negative_control"] = {"note": "pré-declarado; espera-se 6-mer >= Evo2; fora da correção",
+    out["negative_control"] = {"note": "pre-declared; 6-mer expected to win; outside the correction",
                                "tests": neg}
 
     os.makedirs(a.out, exist_ok=True)

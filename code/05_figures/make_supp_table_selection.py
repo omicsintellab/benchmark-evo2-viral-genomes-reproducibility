@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
-"""make_supp_table_selection.py — tabela de seleção de amostras (R1 4.3, R2 #5).
+"""make_supp_table_selection.py — sample-selection table (R1 4.3, R2 #5).
 
-Os revisores apontaram que 981, 1.080 e 1.912 parecem inconsistentes. Estão certos —
-os três números estão corretos, o artigo é que nunca explicou como se compõem. Esta tabela
-é a explicação, e **todos os números são contados dos arquivos de dados**, não digitados.
-(Substitui o fluxograma que ocupava esse papel; um dos revisores pediu "sample-selection
-table or flow diagram", e a tabela cabe melhor no suplementar.)
+The reviewers noted that 981, 1,080 and 1,912 look inconsistent. They are right to ask: the
+three numbers are correct, but the paper never explained how they compose. This table is that
+explanation, and **every number is counted from the data files**, not typed.
 
-ATENÇÃO a uma pegadinha dos dados: existem DUAS colunas chamadas `host`.
-  - em `corpus_manifest.tsv.gz` é o **domínio** do hospedeiro (eukaryote/bacteria/archaea/
-    unknown) — é essa que define a população de 1.080;
-  - em `genome_features.tsv.gz` é a **string livre** do organismo hospedeiro ("Homo sapiens",
-    "tomato", …), com 282 nulos no mesmo subconjunto.
-Usar a segunda no lugar da primeira dá 918 em vez de 1.080 e a tabela passa a mentir.
+Watch out for one trap in the data: there are TWO columns called `host`.
+  - in `corpus_manifest.tsv.gz` it is the host **domain** (eukaryote/bacteria/archaea/unknown),
+    and that is the one defining the 1,080-record population;
+  - in `genome_features.tsv.gz` it is the **free-text** host organism ("Homo sapiens", ...).
+Using the second instead of the first yields 918 rather than 1,080, and the table starts lying.
 
-Uso:
-    python code/05_figures/make_supp_table_selection.py --data <dir do repo público>/data
+Usage:
+    python code/05_figures/make_supp_table_selection.py --data <repo>/data
 """
 import argparse, os
 import pandas as pd
@@ -55,7 +52,7 @@ def main():
     bal_parts = ", ".join(f"{k} {v}" for k, v in bal.items())
     short = [k for k, v in bal.items() if v < 150]
 
-    # organismos multi-record (R2 #4), contados na união
+    # multi-record organisms (R2 #4), counted within the union
     org = g[g.accession.isin(union)].groupby("organism").size()
     n_multi_org = int((org > 1).sum())
     n_multi_rec = int(org[org > 1].sum())

@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
-"""ci_consistency.py — torna o IC consistente com o teste (R1 3.5, R2 #6).
+"""ci_consistency.py — make the confidence interval consistent with the test (R1 3.5, R2 #6).
 
-PROBLEMA QUE ESTE SCRIPT CORRIGE
---------------------------------
-`final_statistics.py` reporta, lado a lado, um p corrigido por Nadeau-Bengio e um IC
-**bootstrap sobre as diferenças por fold**. Os dois usam variâncias diferentes:
+`final_statistics.py` reported, side by side, a p-value corrected by Nadeau-Bengio and a
+confidence interval bootstrapped over the per-fold differences. The two rest on different
+variances:
 
-  - Nadeau-Bengio infla a variância por (1/n + 1/(k-1)), porque folds de CV repetida
-    compartilham dados de treino e NÃO são independentes;
-  - o bootstrap sobre as diferenças por fold trata os folds como independentes — que é
-    exatamente a premissa que R1 3.5 e R2 #6 rejeitaram.
+  - Nadeau-Bengio inflates the variance by (1/n + 1/(k-1)), because folds of repeated
+    cross-validation share training data and are NOT independent;
+  - the bootstrap over per-fold differences treats those folds as independent, which is
+    exactly the assumption R1 3.5 and R2 #6 reject.
 
-Com k=5 e n=15, o fator é 1/15 + 1/4 = 0,3167 contra 1/15 = 0,0667 do bootstrap: o erro
-padrão honesto é **2,18× maior**. O sintoma aparece sob agrupamento por família, onde três
-alvos primários têm IC bootstrap que EXCLUI zero ao lado de p = 0,11–0,22. Publicar assim
-entrega ao revisor a prova de que continuamos usando a variância que ele rejeitou — e um
-leitor atento conclui, corretamente, que o IC está anti-conservador.
+With k = 5 and n = 15 the factor is 1/15 + 1/4 = 0.3167 against 1/15 = 0.0667, so the honest
+standard error is 2.18x larger. The symptom shows under family grouping, where primary targets
+have a bootstrap interval that EXCLUDES zero next to p = 0.11-0.22.
 
-O IC consistente com o teste é o que se obtém invertendo a própria estatística:
+The interval consistent with the test is obtained by inverting the statistic itself:
 
-    IC = d̄ ± t_{0,975; n-1} · sqrt((1/n + 1/(k-1)) · s²_d)
+    CI = d_bar +/- t_{0.975, n-1} * sqrt((1/n + 1/(k-1)) * s^2_d)
 
-Nenhum valor é digitado à mão: tudo recomputa dos scores por fold já cacheados em
-`family_cv_metrics.json`, sem refazer CV nenhuma (evita variação de semente).
+No value is typed by hand: everything recomputes from the per-fold scores already cached in
+`family_cv_metrics.json`, without re-running any cross-validation (which would introduce seed
+variation).
 
-Uso:
+Usage:
     python ci_consistency.py --json ../../results/json --out ../../results/json/ci_consistency.json
 """
 import argparse, json, os
@@ -36,7 +34,7 @@ PRIMARY = ["coding_fraction", "gene_density", "noncoding_bp", "n_genes",
 NEGCTRL = ["cpg_oe", "upa_oe"]
 EVO = "evo2_20b_blocks18"
 BASE = "6mer"
-SPLITS = 5          # folds por repetição (k)
+SPLITS = 5          # folds per repeat (k)
 SEED = 42
 
 
@@ -91,8 +89,8 @@ def main():
     fam = json.load(open(os.path.join(a.json, "family_cv_metrics.json")))
     tg = fam["targets"]
 
-    out = {"note": ("IC recomputado com a MESMA variancia do teste de Nadeau-Bengio. "
-                    "O IC bootstrap sobre diferencas por fold e anti-conservador porque "
+    out = {"note": ("Interval recomputed with the SAME variance as the Nadeau-Bengio test. "
+                    "A bootstrap interval over per-fold differences is anti-conservative because "
                     "trata folds de CV repetida como independentes."),
            "correction_factor": f"1/n + 1/(k-1), k={SPLITS}",
            "schemes": {}}
@@ -122,9 +120,9 @@ def main():
         out["schemes"][scheme] = res
 
     # ---- contrastes contra o MELHOR baseline de cada classe
-    # É aqui que o conflito bootstrap-vs-teste realmente aparece: sob agrupamento por
-    # família o melhor baseline composicional passa a ser o GC+comprimento, e os deltas
-    # ficam pequenos o bastante para que a escolha da variância decida o veredito.
+    # This is where the bootstrap-vs-test conflict actually shows: under family grouping the
+    # best compositional baseline becomes GC-and-length, and the deltas get small enough that
+    # the choice of variance decides the verdict.
     comp = json.load(open(os.path.join(a.json, "composition_baselines_metrics.json")))
     CLASSES = {"compositional": ["kmer3", "kmer4", "kmer5", "kmer6", "multik",
                                  "codon", "dicodon", "gc_len"],
@@ -171,7 +169,7 @@ def main():
         nd = sum(1 for r in res.values() if r["disagreement"])
         log(f"  -> {nd} alvo(s) em que o IC bootstrap contradiz o teste")
         if res:
-            log(f"  -> erro padrao honesto e {list(res.values())[0]['se_ratio_nb_over_bootstrap']:.2f}x "
+            log(f"  -> honest standard error is {list(res.values())[0]['se_ratio_nb_over_bootstrap']:.2f}x "
                 f"o do bootstrap")
 
     log("\n=== CONTRA O MELHOR BASELINE DE CADA CLASSE ===")

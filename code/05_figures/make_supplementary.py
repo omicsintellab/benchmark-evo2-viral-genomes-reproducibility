@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""make_supplementary.py — monta o Material Suplementar UNICO da revisao R1.
+"""make_supplementary.py — build the single Supplementary Material file of revision R1.
 
-As tabelas sao renumeradas pela ORDEM DE CITACAO no manuscrito revisado, que e o que a
-Frontiers exige. A ordem antiga (S1-S4 da submissao + S5-S8 da revisao) NAO era a de
-aparicao: a tabela de selecao de amostras, criada por ultimo, e a segunda a ser citada.
+Tables are renumbered by ORDER OF CITATION in the revised manuscript, which is what the journal
+requires and what the previous numbering did not follow: the sample-selection table, created
+last, is the second one cited.
 
-Nada e digitado: os numeros das quatro tabelas da submissao sao lidos do
-`supplementary_tables.md` do repositorio de reprodutibilidade, e os da revisao vem dos
-JSONs cacheados e das tabelas geradas em results/tables/. As legendas sao texto.
+Nothing is typed: the numbers of the four tables of the July submission are read from
+results/tables/supplementary_tables.md, and those of the revision from the cached JSONs and the
+generated tables in results/tables/. Only the captions are prose.
 
-Uso:
-    python code/05_figures/make_supplementary.py \
-        --out results/tables/supplementary_material_R1.md
+Usage:
+    python code/05_figures/make_supplementary.py [--out results/tables/supplementary_material_R1.md]
 """
 import argparse, json, os, re, sys
 
@@ -20,7 +19,7 @@ ROOT = os.path.join(HERE, "..", "..")
 
 
 def md_section(path, header_startswith):
-    """Devolve o corpo de uma secao markdown (## ...) de um arquivo, sem o cabecalho."""
+    """Return the body of a markdown section (## ...) of a file, without the header."""
     txt = open(path).read().split("\n")
     out, on = [], False
     for l in txt:
@@ -32,21 +31,21 @@ def md_section(path, header_startswith):
         if on:
             out.append(l)
     if not out:
-        sys.exit(f"secao '{header_startswith}' nao encontrada em {path}")
+        sys.exit(f"section '{header_startswith}' not found in {path}")
     return "\n".join(out).strip()
 
 
 def table_only(body):
-    """So as linhas da tabela markdown, descartando prosa da secao."""
+    """Only the rows of the markdown table, dropping the prose of the section."""
     rows = [l for l in body.split("\n") if l.strip().startswith("|")]
     if not rows:
-        sys.exit("sem tabela no bloco")
+        sys.exit("no table in this block")
     return "\n".join(rows)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--repro", default=ROOT, help="raiz do repositorio com as tabelas da submissao")
+    ap.add_argument("--repro", default=ROOT, help="repository root holding the submission tables")
     ap.add_argument("--out", default=os.path.join(ROOT, "results", "tables",
                                                   "supplementary_material_R1.md"))
     a = ap.parse_args()
@@ -61,7 +60,7 @@ def main():
     o.append("Tables are numbered in order of first citation in the manuscript.\n")
     o.append("**1 Supplementary Tables**\n")
 
-    # ---- S1: composicao do corpus (era S4) -- citada em Methods 2.1
+    # ---- S1: corpus composition (was S4), cited in Methods 2.1
     o.append("**Supplementary Table S1.** Composition of the viral genome corpus (n = 19,429 "
              "RefSeq records, including individual segments of segmented viruses), "
              "cross-tabulated by Baltimore replication class and host domain as assigned "
@@ -73,7 +72,7 @@ def main():
              "propagate into the probes.\n")
     o.append(table_only(md_section(SUB, "Table S4.")) + "\n")
 
-    # ---- S2: selecao de amostras (era S8) -- Methods 2.1
+    # ---- S2: sample selection (was S8), Methods 2.1
     sel = open(T("supp_S8_selection.md")).read()
     caption = re.search(r"^Composition of every analysed population\..*?$", sel, re.M).group(0)
     o.append("**Supplementary Table S2.** " + caption.replace(
@@ -84,7 +83,7 @@ def main():
                             sel, re.M):
         o.append(extra + "\n")
 
-    # ---- S3: controle de precisao (era S1) -- Methods 2.5
+    # ---- S3: precision control (was S1), Methods 2.5
     o.append("**Supplementary Table S3.** Precision control on the NVIDIA H100. Cross-validated "
              "probe performance (repeated cluster-aware cross-validation, mean ± SD) for the "
              "Evo 2 20B embedding extracted with native FP8 input projections versus the same "
@@ -95,7 +94,7 @@ def main():
              "precision-agnostic.\n")
     o.append(table_only(md_section(SUB, "Table S1.")) + "\n")
 
-    # ---- S4: CV aleatoria vs cluster-aware (era S2)
+    # ---- S4: random versus cluster-aware CV (was S2)
     o.append("**Supplementary Table S4.** Effect of sequence-identity-aware cross-validation. "
              "Probe performance under random repeated cross-validation versus group-aware "
              "cross-validation in which MMseqs2 linclust clusters (95% identity, 85% coverage) "
@@ -106,7 +105,7 @@ def main():
              "is addressed by the family-grouped analyses of Supplementary Tables S6 and S7.\n")
     o.append(table_only(md_section(SUB, "Table S2.")) + "\n")
 
-    # ---- S5: classificacao + recall por familia (era S7, ampliada)
+    # ---- S5: classification + per-family recall (was S7, extended)
     o.append("**Supplementary Table S5.** Classification beyond accuracy, under the "
              "pre-registered identity-clustered scheme. Balanced accuracy and macro-F1 are "
              "reported because the classes are unbalanced.\n")
@@ -120,7 +119,7 @@ def main():
         o.append(f"| *{fam}* | {v['n']} | {v['recall']:.3f} |")
     o.append("")
 
-    # ---- S6: contrastes primarios (era S5)
+    # ---- S6: primary contrasts (was S5)
     o.append("**Supplementary Table S6.** Primary confirmatory contrasts under both "
              "cross-validation schemes. Evo 2 20B `blocks.18` versus the 6-mer baseline on the "
              "six pre-declared architecture targets. ΔR² is the difference in cross-validated "
@@ -129,7 +128,7 @@ def main():
              "set of six.\n")
     o.append(table_only(md_section(T("supp_S5_S7.md"), "Table S5.")) + "\n")
 
-    # ---- S7: melhor baseline por classe (era S6)
+    # ---- S7: best baseline per class (was S6)
     body = md_section(T("supp_S5_S7.md"), "Table S6.")
     o.append("**Supplementary Table S7.** Evo 2 versus the strongest baseline of each class. For "
              "each target and scheme, the best baseline within each class was selected and "
@@ -139,7 +138,7 @@ def main():
     o.append(table_only(body) + "\n")
     o.append(re.search(r"^\*\*Summary\.\*\*.*$", body, re.M).group(0) + "\n")
 
-    # ---- S8: sensibilidade da definicao de gene overlap (NOVA)
+    # ---- S8: sensitivity of the gene-overlap definition (NEW)
     ov = J("overlap_sensitivity.json")
     o.append("**Supplementary Table S8.** Sensitivity of the gene-overlap contrast to the "
              f"definition of the feature (n = {ov['n']:,}). The published definition counts a "
@@ -158,7 +157,7 @@ def main():
                      f"{r['delta']:+.3f} | {fmt_p(r['p'])} |")
     o.append("")
 
-    # ---- S9: PCA-150 (era S3)
+    # ---- S9: PCA-150 (was S3)
     o.append("**Supplementary Table S9.** Dimensionality-matched comparison. Because the 20B "
              "embedding is higher-dimensional than the 7B (8,192 versus 4,096 components), which "
              "could by itself inflate linear-probe performance, every probe was re-run with both "
@@ -169,7 +168,7 @@ def main():
              "mean ± SD.\n")
     o.append(table_only(md_section(SUB, "Table S3.")) + "\n")
 
-    # ---- S10: generalizacao por familia (LOFO + dentro de familia)
+    # ---- S10: family-level generalisation (LOFO + within-family)
     fam = J("family_cv_metrics.json")
     wf = J("within_family_cv_metrics.json")
     o.append("**Supplementary Table S10.** Family-level generalisation. Leave-one-family-out is "
