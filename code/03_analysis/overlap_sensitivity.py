@@ -24,7 +24,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from scale_analysis import DATA, load_20b, kmer_matrix, groups as cl95_groups
-from family_cv import reg_group, nadeau_bengio, boot_ci, SPLITS
+from family_cv import reg_group, nadeau_bengio, nb_ci, boot_ci, SPLITS
 
 DEFS = {"published": "overlap_bp_published",
         "positions": "overlap_positions",
@@ -63,9 +63,10 @@ def main():
             e = reg_group(X, y, g)
             k = reg_group(KM, y, g)
             t, p = nadeau_bengio(e, k, SPLITS)
-            lo, hi = boot_ci(e, k)
+            lo, hi = nb_ci(e, k, SPLITS); blo, bhi = boot_ci(e, k)
             rec[sch] = {"r2_evo2": float(e.mean()), "r2_6mer": float(k.mean()),
                         "delta": float(e.mean() - k.mean()), "ci95": [lo, hi],
+                        "ci95_bootstrap": [blo, bhi],
                         "t": t, "p": p}
             print(f"{dname:<14}{sch:>8}{e.mean():>9.3f}{k.mean():>9.3f}"
                   f"{e.mean()-k.mean():>9.3f}{p:>11.2g}")

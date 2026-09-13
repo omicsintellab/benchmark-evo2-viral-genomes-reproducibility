@@ -104,7 +104,19 @@ def nadeau_bengio(a, b, n_splits=SPLITS):
     return float(t), float(2 * stats.t.sf(abs(t), n - 1))
 
 
+def nb_ci(a, b, n_splits=SPLITS, level=0.95):
+    """Confidence interval that inverts the same corrected statistic as nadeau_bengio(), so that
+    interval and p-value rest on one variance estimate. This is the interval the paper reports."""
+    d = np.asarray(a) - np.asarray(b); n = len(d)
+    if n < 2: return float("nan"), float("nan")
+    se = np.sqrt((1.0 / n + 1.0 / (n_splits - 1)) * d.var(ddof=1))
+    tcrit = stats.t.ppf(0.5 + level / 2, n - 1)
+    return float(d.mean() - tcrit * se), float(d.mean() + tcrit * se)
+
+
 def boot_ci(a, b, n=10000, seed=SEED):
+    """Bootstrap over per-fold differences. Kept for reference only (`ci95_bootstrap`): it treats
+    the folds of repeated cross-validation as independent and is anti-conservative."""
     d = np.asarray(a) - np.asarray(b)
     rng = np.random.default_rng(seed)
     bs = rng.choice(d, size=(n, len(d)), replace=True).mean(axis=1)
@@ -232,8 +244,9 @@ def main():
         e = out["targets"][name]["reps"]["evo2_20b_blocks18"]["family"]["scores"]
         k = out["targets"][name]["reps"]["6mer"]["family"]["scores"]
         t, p = nadeau_bengio(e, k)
-        lo, hi = boot_ci(e, k)
+        lo, hi = nb_ci(e, k); blo, bhi = boot_ci(e, k)
         tests[name] = {"delta_mean": float(np.mean(e) - np.mean(k)), "ci95": [lo, hi],
+                       "ci95_bootstrap": [blo, bhi],
                        "t_nadeau_bengio": t, "p_raw": p, "n_folds": len(e)}
         pv.append(p)
     adj = holm(pv, prim)
@@ -247,8 +260,9 @@ def main():
     for name, _ in NEGCTRL:
         e = out["targets"][name]["reps"]["evo2_20b_blocks18"]["family"]["scores"]
         k = out["targets"][name]["reps"]["6mer"]["family"]["scores"]
-        t, p = nadeau_bengio(e, k); lo, hi = boot_ci(e, k)
+        t, p = nadeau_bengio(e, k); lo, hi = nb_ci(e, k); blo, bhi = boot_ci(e, k)
         neg[name] = {"delta_mean": float(np.mean(e) - np.mean(k)), "ci95": [lo, hi],
+                     "ci95_bootstrap": [blo, bhi],
                      "t_nadeau_bengio": t, "p_raw": p}
     out["negative_control"] = {"note": "pre-declared; 6-mer expected to win; outside the correction",
                                "tests": neg}

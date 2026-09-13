@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """viral_features_extended.py — Painel estendido de features virais pro 20B (blocks.18,
-a camada principal do paper), com a MESMA suíte rigorosa (R2(emb) cru, baselines
-6-mer/GC+len, CV cluster-aware, 3 repeats) usada em scale_analysis.py.
+a camada principal do paper), com as mesmas baselines de scale_analysis.py (R2(emb) cru,
+6-mer/GC+len, 5 folds x 3 repeats) mas sob CV ALEATORIA (reg_rand), nao cluster-aware.
+E a origem das linhas CpG/UpA/overlap da Tabela 1 e da Fig. 1C, cujas legendas declaram isso;
+os contrastes cluster-aware desses alvos estao em final_statistics.json e overlap_sensitivity.json.
 
 Duas features NOVAS, biologicamente motivadas (não estavam no painel original):
 
