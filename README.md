@@ -5,14 +5,14 @@ Code, curated inputs and cached metrics for:
 > **Decoding taxonomy and genome-level architecture from Evo 2 embeddings of viral genomes: a linear-probe benchmark against compositional baselines**
 > Amgarten D., Schinaid A., de Mello Malta F., Marra A. R., Pinho J. R. R.
 >
-> Submitted to *Frontiers in Bioinformatics* (Brief Research Report, Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*; **revised version submitted 2026-08-23** after a major-revision decision. The title above is the revised one; the version submitted in July was titled *"Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2"*.
+> Submitted to *Frontiers in Bioinformatics* (Brief Research Report, Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*; **revised version submitted 2026-08-23** after a major-revision decision; a second revision (R2), limited to consistency of wording, methods documentation and statistical reporting, followed. The title above is the revised one; the version submitted in July was titled *"Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2"*.
 >
 > Preprint: **bioRxiv** [10.64898/2026.07.14.738542](https://doi.org/10.64898/2026.07.14.738542).
 
 The study benchmarks the **Evo 2 20B base model** (with the 7B model as a scale comparator; neither fine-tuned) on a pre-registered corpus of **19,429 RefSeq viral genomes**, along three axes:
 
 1. **Representation** — linear probes decoding Baltimore class, host domain and viral family from mean-pooled embeddings.
-2. **Feature decoding** — ridge probes recovering genome architecture (coding fraction, gene density, gene overlap, …), benchmarked against a 6-mer composition representation and a GC+length control.
+2. **Feature decoding** — ridge probes recovering genome architecture (coding fraction, gene density, gene overlap, …), benchmarked against ten baselines in two classes: compositional (k-mers for k = 3–6, multi-k, codon and dicodon frequencies, GC+length) and annotation-/ORF-derived (a six-frame ORF summary and a combined representation).
 3. **Generation** — teacher-forced cross-entropy (bits/nt) and fragment completion on a leakage-safe set of eukaryote-infecting viruses (held out of Evo 2's training corpus) versus a bacteriophage comparator, whose clade is documented as included in the training corpus.
 
 ---
@@ -42,8 +42,21 @@ The generated file names keep the identifiers used during analysis and **do not 
 | Figure 1 (probes: confusion matrix, accuracy, R², PCA) | `figures/final/figure1.{png,svg}` | `figures/figure1_combined.{png,svg}` | `make_figure1_combined.py` | `fig_artifacts_20b.json`, `scale_metrics.json`, `viral_features_extended_metrics.json` |
 | Figure 2 (generation: perplexity, completion) | `figures/final/figure2.{png,svg}` | `figures/figure3_20b.{png,svg}` | `make_figures_20b.py` | `generation_summary_evo2_20b.json` |
 | Figure 3 (layer sensitivity + 20B vs 7B scale) | `figures/final/figure3.{png,svg}` | `figures/figure3_combined.{png,svg}` | `make_figure3_combined.py` | `scale_metrics.json`, `pca_control_metrics.json` |
-| Table 1 (probe performance ± SD, paired tests) | — | `results/tables/probe_metrics_20b.md` | `make_figures_20b.py` | same as Figure 1 |
+| Table 1 (probe performance ± SD, statistical status) | — | `results/tables/probe_metrics_20b.md` | `make_figures_20b.py table` | same as Figure 1 |
 | Supplementary Tables S1–S4 | — | `results/tables/supplementary_tables.md` | `make_supplementary_tables.py` | `precision_control_metrics.json`, `scale_metrics.json`, `pca_control_metrics.json`, `data/corpus_manifest.tsv.gz` |
+
+### Analysed populations and statistical status
+
+Two populations feed the paper, and they are not interchangeable:
+
+| Population | n | Used for | Nature |
+|---|---|---|---|
+| Probe subsets (`data/probe_subset_*.tsv`) | 981 (Baltimore), 1,080 (host), 349 (family), 1,200 (regression); union 1,912 | Table 1, Figure 1, Figure 3, Supplementary Tables S3, S4, S5, S9 | Descriptive estimates (mean ± SD over 15 folds) |
+| Union restricted to records with an assigned family | 1,691 | Supplementary Tables S6, S7, S8 and S10 (`family_cv.py`, `composition_baselines.py`, `final_statistics.py`, `overlap_sensitivity.py`, `within_family_cv.py`) | Inference: both CV schemes run on the same records and folds |
+
+The **six primary contrasts** (Evo 2 20B blocks.18 vs 6-mer on coding fraction, gene density, non-coding bp, gene count, mean intergenic length, gene overlap) are tested with the Nadeau–Bengio corrected resampled t-test, Holm-corrected within the set, with a confidence interval that inverts the same statistic (`ci95`; the bootstrap interval is kept only as `ci95_bootstrap`). CpG and UpA O/E are the pre-declared negative control, outside the correction. Everything else is exploratory; nominal p-values quoted for exploratory analyses (Supplementary Tables S7 and S8, the block-shuffling dose-response, the adjusted generation gap) are uncorrected.
+
+Cross-validation scheme per result: cluster-aware (MMseqs2 95% identity / 85% coverage clusters as groups) throughout, **except** the CpG, UpA and gene-overlap rows of Table 1 and Figure 1C, which come from `viral_features_extended.py` under repeated random CV. Their cluster-aware contrasts are in `final_statistics.json` and `overlap_sensitivity.json`.
 
 Those four tables are the ones of the **July submission**. The revised manuscript carries a single supplementary file with **ten tables, renumbered in order of citation**: it is generated by `code/05_figures/make_supplementary.py` into `results/tables/supplementary_material_R1.md`, and `verify_supplementary.py` checks a submitted `.docx` cell by cell against the cached artefacts.
 
@@ -56,7 +69,7 @@ Run in order. Stages 2 and 4 need a GPU with the [Evo 2](https://github.com/ArcI
 | Stage | Directory | What it does | Hardware |
 |---|---|---|---|
 | 1. Corpus | [`code/01_corpus/`](code/01_corpus) | Downloads the RefSeq viral release, joins ICTV VMR (MSL41) taxonomy, applies the pre-registered quotas, extracts per-genome features from the GenBank flat files, clusters by sequence identity (MMseqs2 linclust, 95% id / 85% cov). `make_analysis_inputs.py` converts the shipped TSVs into the parquet inputs the later stages read — run it once before stages 2–4. | CPU |
-| 2. Embeddings | [`code/02_embeddings/`](code/02_embeddings) | `probe_evo2_viral.py` extracts windowed (32 kb window / 16 kb stride) mean-pooled embeddings and runs the probe battery. `sweep_layers_20b.py` extracts five candidate layers in a single forward pass for the layer-sensitivity analysis. | GPU (H100 for the 20B, FP8; L40S for the 7B, bf16) |
+| 2. Embeddings | [`code/02_embeddings/`](code/02_embeddings) | `probe_evo2_viral.py` extracts mean-pooled embeddings: genomes up to 32,768 bp in a single pass, longer ones in 32 kb windows with a 16 kb stride, **capped at 8 evenly spaced windows** (`--max-windows 8`, also the default of `sweep_layers_20b.py` and `01_block_shuffle.py`), so the 69 probed records longer than 147,456 bp are only partly covered. It then runs the probe battery. `sweep_layers_20b.py` extracts five candidate layers in a single forward pass for the layer-sensitivity analysis. | GPU (H100 for the 20B, FP8; L40S for the 7B, bf16) |
 | 3. Analysis | [`code/03_analysis/`](code/03_analysis) | Cluster-aware CV (`cluster_cv.py`), scale comparison (`scale_analysis.py`), dimensionality-matched PCA control (`pca_control.py`), FP8-vs-bf16 precision control (`precision_control.py`), extended features (`viral_features_extended.py`). Emits the JSONs in `results/json/`. | CPU (needs the cached embeddings) |
 | 4. Generation | [`code/04_generation/`](code/04_generation) | Teacher-forced perplexity and prompt→gap completion against a 4th-order Markov baseline. | GPU |
 | 5. Figures | [`code/05_figures/`](code/05_figures) | Plots and metric tables from the cached JSONs. | CPU |
@@ -91,7 +104,7 @@ Everything needed to identify the exact genomes analysed, derived entirely from 
 
 | File | Contents |
 |---|---|
-| `corpus_design.yaml` | The **pre-registration**: quotas, quality cut-offs, dedup and split parameters, fixed before the data were seen. |
+| `corpus_design.yaml` | The **pre-registration** (written for the project's fine-tuning corpus): quota groups, identity-clustering parameters and the cluster-aware split requirement used by this benchmark. Its length and N cut-offs apply to the fine-tuning selection only — see [`data/README.md`](data/README.md). |
 | `corpus_manifest.tsv.gz` | The 19,429-genome corpus: accession, family, genus, Baltimore class, host domain, quota group, length. |
 | `genome_features.tsv.gz` | Per-genome architectural features (coding fraction, gene density, gene overlap, intergenic statistics, GC, …) — the regression targets. |
 | `probe_subset_baltimore.tsv` | The 981 accessions used for the Baltimore probe. |

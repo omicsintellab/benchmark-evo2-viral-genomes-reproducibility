@@ -13,12 +13,12 @@ Entrada (JSONs pequenos, versionados em results/json/; ver DATA_DIR):
 Saídas: figure1_20b.svg/png (Baltimore CM + classificação), figure2_20b.svg/png
 (R² 8 features + PCA scatter), figure3_20b.svg/png (geração/completação),
 figure4_layer_sensitivity.svg/png (varredura de camadas, transparência da
-escolha blocks.18), probe_metrics_20b.md (tabela com testes pareados).
+escolha blocks.18), probe_metrics_20b.md (Tabela 1: estimativas descritivas + status estatístico).
+Uso: `python make_figures_20b.py` (tudo) ou `python make_figures_20b.py table` (só a tabela).
 """
 import os, sys, json, numpy as np
 import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_rel
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.join(HERE, "..", "..")
@@ -216,34 +216,42 @@ def figure4():
     print("figure4_layer_sensitivity")
 
 # ======================= tabela =======================
-def pstar(p): return "***" if p < 1e-3 else "**" if p < 1e-2 else "*" if p < 0.05 else "ns"
 def msd(m, s): return f"{m:.3f} ± {s:.3f}"
 
+STATUS = {"Baltimore": "Exploratory", "Host": "Exploratory", "Family": "Exploratory",
+          "cpg_oe": "Negative control", "upa_oe": "Negative control"}
+
+
 def write_table():
-    hdr = ["Probe", "Target", "Evo 2 20B (blocks.18)", "6-mer composition", "GC + length",
-           "20B vs k-mer", "20B vs GC+len"]
+    """Table 1 of the manuscript. Values are descriptive estimates; inference lives in
+    final_statistics.json (Supplementary Table S6), on the 1,691 records with an assigned family."""
+    hdr = ["Probe", "Target", "Evo 2 20B (blocks.18)", "6-mer composition", "GC + length", "Status"]
     rows = []
     for t in CLF_TARGETS:
         eo, es = get_20b_meanstd(t); ko, ks = get_base_meanstd(t, "kmer"); go, gs = get_base_meanstd(t, "gclen")
-        ev, kv, gv = vals(REP20[t]["clus"]), get_base_vals(t, "kmer"), get_base_vals(t, "gclen")
-        rows.append(["Class. (acc)", t, msd(eo, es), msd(ko, ks), msd(go, gs),
-                     pstar(ttest_rel(ev, kv).pvalue), pstar(ttest_rel(ev, gv).pvalue)])
-    for t in REG_TARGETS:
+        rows.append(["Class. (acc)", t, msd(eo, es), msd(ko, ks), msd(go, gs), STATUS[t]])
+    for t in REG_TARGETS + VFE_TARGETS:
         eo, es = get_20b_meanstd(t); ko, ks = get_base_meanstd(t, "kmer"); go, gs = get_base_meanstd(t, "gclen")
-        ev, kv, gv = vals(REP20[t]["clus"]), get_base_vals(t, "kmer"), get_base_vals(t, "gclen")
-        rows.append(["Regr. (R²)", t, msd(eo, es), msd(ko, ks), msd(go, gs),
-                     pstar(ttest_rel(ev, kv).pvalue), pstar(ttest_rel(ev, gv).pvalue)])
-    for t in VFE_TARGETS:
-        eo, es = get_20b_meanstd(t); ko, ks = get_base_meanstd(t, "kmer"); go, gs = get_base_meanstd(t, "gclen")
-        rows.append(["Regr. (R²)", t, msd(eo, es), msd(ko, ks), msd(go, gs), "n/a¹", "n/a¹"])
-    out = ["# Probe metrics — Evo 2 20B (blocks.18, FP8), cluster-aware CV (5×3 repeats, mean ± SD)\n",
-           "Significance: paired t-test across the 15 fold values; *** p<0.001, ** p<0.01, * p<0.05, ns.\n",
-           "1. CpG/UpA/overlap probes were run with only mean/SD cached (no per-fold significance test).\n",
+        cv = " ¹" if t in VFE_TARGETS else ""
+        rows.append(["Regr. (R²)", t + cv, msd(eo, es), msd(ko, ks), msd(go, gs),
+                     STATUS.get(t, "Primary (S6)")])
+    out = ["# Probe metrics — Evo 2 20B (blocks.18, FP8), mean ± SD over 5×3 repeated CV (Table 1)\n",
+           "Descriptive estimates, cluster-aware CV. Status follows Section 2.8 of the manuscript: "
+           "*Primary (S6)* = tested with the Nadeau–Bengio corrected resampled t-test and Holm "
+           "correction on the 1,691 records with an assigned family (`final_statistics.json`); "
+           "*Negative control* = pre-declared, outside the correction; *Exploratory* = no "
+           "confirmatory test.\n",
+           "1. Repeated **random** (not cluster-aware) CV, from `viral_features_extended_metrics.json`; "
+           "the two schemes differ by at most 0.012 on every target evaluated under both "
+           "(Supplementary Table S4).\n",
            "| " + " | ".join(hdr) + " |", "|" + "|".join(["---"] * len(hdr)) + "|"]
     for r in rows: out.append("| " + " | ".join(str(c) for c in r) + " |")
     open(f"{DOC}/probe_metrics_20b.md", "w").write("\n".join(out) + "\n")
     print("\n".join(out))
 
 if __name__ == "__main__":
-    figure1(); figure2(); figure3(); figure4(); write_table()
+    if sys.argv[1:] == ["table"]:
+        write_table()
+    else:
+        figure1(); figure2(); figure3(); figure4(); write_table()
     print("OK")

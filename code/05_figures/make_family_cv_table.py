@@ -62,8 +62,8 @@ def main():
     # --- T2: testes primarios
     L.append("\n## Table R1-B. Primary confirmatory tests — Evo 2 vs 6-mer, family-grouped CV\n")
     L.append("Six pre-specified contrasts, corrected resampled t-test (Nadeau & Bengio) with "
-             "Holm correction within the family of six. ΔR² = Evo 2 − 6-mer; CI is a 10,000-draw "
-             "bootstrap over the fold deltas.\n")
+             "Holm correction within the family of six. ΔR² = Evo 2 − 6-mer; the 95% CI inverts the "
+             "same corrected statistic as the test.\n")
     L.append("| Target | Evo 2 | 6-mer | ΔR² | 95% CI | t | p | p (Holm) |")
     L.append("|---|---|---|---|---|---|---|---|")
     for t in prim:

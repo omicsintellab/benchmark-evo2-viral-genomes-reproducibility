@@ -4,7 +4,9 @@ All files here derive from **public sources**: the NCBI RefSeq viral release (Ma
 
 ## `corpus_design.yaml` — the pre-registration
 
-Quotas (Baltimore class × host domain), quality cut-offs, sanitisation filters, dedup parameters (MMseqs2: 95% identity, 85% coverage) and split seeds, all fixed **before** the data were inspected. `meta.version` is bumped on any change, with the rationale recorded in the changelog block and in git history. Consumed by `code/01_corpus/compose_v1_groups.py`.
+Quotas (Baltimore class × host domain), quality cut-offs, sanitisation filters, dedup parameters (MMseqs2: 95% identity, 85% coverage) and split seeds, fixed before the data were inspected.
+
+**Scope for this benchmark.** The file was written for the project's fine-tuning corpus. The benchmark uses its **quota groups** and its **identity-clustering parameters** (the `quota_group` column and `cl95_cluster.tsv`), and follows its requirement of cluster-aware splitting. It does **not** apply the fine-tuning cut-offs: `min_length: 1000` and `sanitize.max_N_fraction` are enforced only in `code/01_corpus/build_v1_selection.py`, so the corpus manifest keeps 573 records shorter than 1,000 bp, 63 of them in the probe subsets (shortest 266 bp). The `split` block (90/5/5 train/val/test) is the fine-tuning split; the probes use 5-fold × 3-repeat cross-validation, which was not pre-registered. The `v2` changelog entry (2026-06-29) changes the fine-tuning balancing policy only. `meta.version` is bumped on any change, with the rationale recorded in the changelog block and in git history. Consumed by `code/01_corpus/compose_v1_groups.py`.
 
 ## `corpus_manifest.tsv.gz` — the 19,429-genome corpus
 
@@ -35,7 +37,7 @@ Computed per record directly from the GenBank flat files with Biopython (`code/0
 | `gene_density` | Annotated gene features per kb (falls back to the CDS count when a record has no explicit gene features). |
 | `mean_CDS_len` | Mean CDS length. |
 | `n_intergenic`, `mean_intergenic_len`, `median_intergenic_len`, `max_intergenic_len` | Gaps between consecutive, non-overlapping CDS loci. |
-| `overlap_bp` | Summed length of all CDS loci minus the length of their union — base pairs covered by more than one CDS (a hallmark of genome compression in small viruses). Log-transformed for probing. |
+| `overlap_bp` | Summed length of all CDS loci minus the length of their union: a position covered by *k* CDS counts *k* − 1 times, strands not separated (a hallmark of genome compression in small viruses). Log-transformed for probing. This is the definition used in every main analysis; two alternatives (positions covered by ≥2 CDS; same-strand only) are compared in `overlap_sensitivity.json` / Supplementary Table S8. |
 | `has_introns`, `strand_balance` | Presence of spliced CDSs; balance of CDSs between strands. |
 | `family`, `genus`, `host` | Denormalised taxonomy, for convenience. |
 

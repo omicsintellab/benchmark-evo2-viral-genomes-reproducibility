@@ -42,7 +42,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from scale_analysis import DATA, load_20b, kmer_matrix, gclen, seqs_for, groups as cl95_groups
-from family_cv import (PRIMARY, NEGCTRL, reg_group, reg_rand, nadeau_bengio, boot_ci, holm,
+from family_cv import (PRIMARY, NEGCTRL, reg_group, reg_rand, nadeau_bengio, nb_ci, boot_ci, holm,
                        SPLITS, REPEATS)
 from viral_features_extended import dinuc_oe
 
@@ -253,9 +253,9 @@ def main():
                 if r == "evo2_20b_blocks18":
                     continue
                 b = out["targets"][name]["reps"][r][scheme]["scores"]
-                t, p = nadeau_bengio(e, b); lo, hi = boot_ci(e, b)
+                t, p = nadeau_bengio(e, b); lo, hi = nb_ci(e, b); blo, bhi = boot_ci(e, b)
                 rows[r] = {"delta": float(np.mean(e) - np.mean(b)), "ci95": [lo, hi],
-                           "t": t, "p_raw": p}
+                           "ci95_bootstrap": [blo, bhi], "t": t, "p_raw": p}
                 pv.append(p); names.append(r)
             adj = holm(pv, names)
             for r in names:
@@ -268,6 +268,7 @@ def main():
                     "best": best,
                     "best_r2": out["targets"][name]["reps"][best][scheme]["mean"],
                     "delta": rows[best]["delta"], "ci95": rows[best]["ci95"],
+                    "ci95_bootstrap": rows[best]["ci95_bootstrap"],
                     "p": rows[best]["p_raw"],
                     "evo2_ahead": bool(rows[best]["delta"] > 0 and rows[best]["p_raw"] < 0.05)}
             per_target[name] = entry

@@ -38,16 +38,16 @@ Ridge probes, 5-fold x 3 repeats, alphas [1, 10, 100, 1000], seed 42. LOFO = lea
 
 ## Table R1-B. Primary confirmatory tests — Evo 2 vs 6-mer, family-grouped CV
 
-Six pre-specified contrasts, corrected resampled t-test (Nadeau & Bengio) with Holm correction within the family of six. ΔR² = Evo 2 − 6-mer; CI is a 10,000-draw bootstrap over the fold deltas.
+Six pre-specified contrasts, corrected resampled t-test (Nadeau & Bengio) with Holm correction within the family of six. ΔR² = Evo 2 − 6-mer; the 95% CI inverts the same corrected statistic as the test.
 
 | Target | Evo 2 | 6-mer | ΔR² | 95% CI | t | p | p (Holm) |
 |---|---|---|---|---|---|---|---|
-| coding_fraction | 0.207 | -0.113 | 0.319 | [0.233, 0.403] | 3.27 | 0.0056 | 0.017 |
-| gene_density | 0.532 | 0.094 | 0.438 | [0.368, 0.506] | 5.42 | <1e-4 | 0.00054 |
-| noncoding_bp | 0.599 | -0.109 | 0.708 | [0.577, 0.860] | 4.24 | 0.00083 | 0.0042 |
-| n_genes | 0.782 | 0.107 | 0.676 | [0.507, 0.876] | 3.11 | 0.0076 | 0.017 |
-| mean_intergenic_len | 0.331 | -0.236 | 0.567 | [0.444, 0.705] | 3.73 | 0.0022 | 0.0089 |
-| overlap_bp | 0.338 | -0.049 | 0.387 | [0.273, 0.517] | 2.71 | 0.017 | 0.017 |
+| coding_fraction | 0.207 | -0.113 | 0.319 | [0.110, 0.529] | 3.27 | 0.0056 | 0.017 |
+| gene_density | 0.532 | 0.094 | 0.438 | [0.265, 0.611] | 5.42 | <1e-4 | 0.00054 |
+| noncoding_bp | 0.599 | -0.109 | 0.708 | [0.350, 1.067] | 4.24 | 0.00083 | 0.0042 |
+| n_genes | 0.782 | 0.107 | 0.676 | [0.210, 1.141] | 3.11 | 0.0076 | 0.017 |
+| mean_intergenic_len | 0.331 | -0.236 | 0.567 | [0.241, 0.893] | 3.73 | 0.0022 | 0.0089 |
+| overlap_bp | 0.338 | -0.049 | 0.387 | [0.080, 0.694] | 2.71 | 0.017 | 0.017 |
 
 ## Table R1-C. Exploratory — Evo 2 vs GC+length, family-grouped CV
 
@@ -81,8 +81,8 @@ The pooled R² is computed over the stacked out-of-fold predictions; the per-fam
 
 | Target | Evo 2 | 6-mer | ΔR² | 95% CI | p (uncorrected) |
 |---|---|---|---|---|---|
-| cpg_oe | 0.897 | 0.949 | -0.053 | [-0.097, -0.024] | 0.25 |
-| upa_oe | 0.811 | 0.924 | -0.113 | [-0.161, -0.079] | 0.032 |
+| cpg_oe | 0.897 | 0.949 | -0.053 | [-0.147, 0.042] | 0.25 |
+| upa_oe | 0.811 | 0.924 | -0.113 | [-0.215, -0.011] | 0.032 |
 
 ## Table R1-F. Within-family cross-validation
 

@@ -16,9 +16,9 @@ What the reviewers ask for and what comes out of here:
   - Pre-declared negative control (cpg_oe, upa_oe), OUTSIDE the correction.
   - Sensitivity: the same contrasts under family grouping.
 
-Note on intervals: the intervals reported in the paper come from `ci_consistency.py`, which
-inverts the same corrected statistic as the test. The bootstrap over per-fold differences was
-abandoned because it treats those folds as independent.
+Note on intervals: `ci95` inverts the same corrected statistic as the test (identical to
+`ci95_nb` in `ci_consistency.json`, which is what the paper reports). The bootstrap over
+per-fold differences is kept only as `ci95_bootstrap`: it treats those folds as independent.
 
 Usage:
     python final_statistics.py --out ../../results/json
@@ -28,7 +28,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from family_cv import PRIMARY, NEGCTRL, nadeau_bengio, boot_ci, holm, SPLITS
+from family_cv import PRIMARY, NEGCTRL, nadeau_bengio, nb_ci, boot_ci, holm, SPLITS
 
 ROOT = os.path.join(HERE, "..", "..")
 
@@ -42,10 +42,11 @@ def cohens_d(a, b):
 
 def contrast(e, b, label_a, label_b):
     t, p = nadeau_bengio(e, b, SPLITS)
-    lo, hi = boot_ci(e, b)
+    lo, hi = nb_ci(e, b, SPLITS); blo, bhi = boot_ci(e, b)
     return {"a": label_a, "b": label_b,
             "r2_a": float(np.mean(e)), "r2_b": float(np.mean(b)),
             "delta": float(np.mean(e) - np.mean(b)), "ci95": [lo, hi],
+            "ci95_bootstrap": [blo, bhi],
             "cohens_d": cohens_d(e, b), "t_nadeau_bengio": t, "p_raw": p,
             "n_folds": len(e)}
 
@@ -120,8 +121,8 @@ def main():
     # ---- strongest baseline per class, when available
     if comp:
         out["vs_best_baseline_by_class"] = {
-            sch: {t: {cls: {k: v[k] for k in ("best", "best_r2", "delta", "ci95", "p",
-                                              "evo2_ahead")}
+            sch: {t: {cls: {k: v[k] for k in ("best", "best_r2", "delta", "ci95",
+                                              "ci95_bootstrap", "p", "evo2_ahead")}
                       for cls, v in tv["by_class"].items()}
                   for t, tv in comp["tests"][sch].items()}
             for sch in ("cl95", "family")}

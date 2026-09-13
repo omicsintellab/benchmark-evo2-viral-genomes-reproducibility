@@ -52,18 +52,18 @@ Members: `3-mer`, `4-mer`, `5-mer`, `6-mer`, `multi-k`, `codon`, `dicodon`, `GC+
 
 | Scheme | Target | Evo 2 | Best in class | ΔR² | 95% CI | p | Evo 2 ahead? |
 |---|---|---|---|---|---|---|---|
-| cl95 | coding_fraction | 0.376 | 5-mer (0.153) | +0.223 | [0.195, 0.252] | <1e-4 | yes |
-| cl95 | gene_density | 0.776 | dicodon (0.433) | +0.342 | [0.309, 0.376] | <1e-4 | yes |
-| cl95 | noncoding_bp | 0.766 | GC+len (0.549) | +0.217 | [0.189, 0.245] | <1e-4 | yes |
-| cl95 | n_genes | 0.895 | GC+len (0.739) | +0.157 | [0.142, 0.172] | <1e-4 | yes |
-| cl95 | mean_intergenic_len | 0.554 | GC+len (0.239) | +0.315 | [0.294, 0.334] | <1e-4 | yes |
-| cl95 | overlap_bp | 0.623 | GC+len (0.285) | +0.338 | [0.319, 0.358] | <1e-4 | yes |
-| family | coding_fraction | 0.207 | 4-mer (0.007) | +0.199 | [0.128, 0.277] | 0.035 | yes |
-| family | gene_density | 0.532 | 5-mer (0.096) | +0.436 | [0.372, 0.500] | <1e-4 | yes |
-| family | noncoding_bp | 0.599 | GC+len (0.539) | +0.060 | [0.028, 0.089] | 0.11 | **no** |
-| family | n_genes | 0.782 | GC+len (0.722) | +0.061 | [0.019, 0.102] | 0.22 | **no** |
-| family | mean_intergenic_len | 0.331 | GC+len (0.206) | +0.126 | [0.081, 0.169] | 0.027 | yes |
-| family | overlap_bp | 0.338 | GC+len (0.246) | +0.092 | [0.026, 0.152] | 0.22 | **no** |
+| cl95 | coding_fraction | 0.376 | 5-mer (0.153) | +0.223 | [0.151, 0.295] | <1e-4 | yes |
+| cl95 | gene_density | 0.776 | dicodon (0.433) | +0.342 | [0.259, 0.425] | <1e-4 | yes |
+| cl95 | noncoding_bp | 0.766 | GC+len (0.549) | +0.217 | [0.148, 0.287] | <1e-4 | yes |
+| cl95 | n_genes | 0.895 | GC+len (0.739) | +0.157 | [0.118, 0.195] | <1e-4 | yes |
+| cl95 | mean_intergenic_len | 0.554 | GC+len (0.239) | +0.315 | [0.266, 0.364] | <1e-4 | yes |
+| cl95 | overlap_bp | 0.623 | GC+len (0.285) | +0.338 | [0.290, 0.385] | <1e-4 | yes |
+| family | coding_fraction | 0.207 | 4-mer (0.007) | +0.199 | [0.016, 0.383] | 0.035 | yes |
+| family | gene_density | 0.532 | 5-mer (0.096) | +0.436 | [0.276, 0.597] | <1e-4 | yes |
+| family | noncoding_bp | 0.599 | GC+len (0.539) | +0.060 | [-0.015, 0.135] | 0.11 | **no** |
+| family | n_genes | 0.782 | GC+len (0.722) | +0.061 | [-0.040, 0.162] | 0.22 | **no** |
+| family | mean_intergenic_len | 0.331 | GC+len (0.206) | +0.126 | [0.017, 0.235] | 0.027 | yes |
+| family | overlap_bp | 0.338 | GC+len (0.246) | +0.092 | [-0.063, 0.246] | 0.22 | **no** |
 
 ### annotation-like baselines (6-frame ORF scan)
 
@@ -71,15 +71,15 @@ Members: `ORF`, `compo_all`
 
 | Scheme | Target | Evo 2 | Best in class | ΔR² | 95% CI | p | Evo 2 ahead? |
 |---|---|---|---|---|---|---|---|
-| cl95 | coding_fraction | 0.376 | ORF (0.223) | +0.153 | [0.122, 0.184] | 0.00074 | yes |
-| cl95 | gene_density | 0.776 | ORF (0.588) | +0.188 | [0.168, 0.207] | <1e-4 | yes |
-| cl95 | noncoding_bp | 0.766 | ORF (0.675) | +0.091 | [0.067, 0.112] | 0.0032 | yes |
-| cl95 | n_genes | 0.895 | ORF (0.900) | -0.005 | [-0.015, 0.006] | 0.66 | **no** |
-| cl95 | mean_intergenic_len | 0.554 | ORF (0.335) | +0.219 | [0.205, 0.232] | <1e-4 | yes |
-| cl95 | overlap_bp | 0.623 | ORF (0.387) | +0.236 | [0.216, 0.254] | <1e-4 | yes |
-| family | coding_fraction | 0.207 | ORF (0.182) | +0.025 | [-0.021, 0.067] | 0.64 | **no** |
-| family | gene_density | 0.532 | ORF (0.520) | +0.012 | [-0.041, 0.059] | 0.84 | **no** |
-| family | noncoding_bp | 0.599 | ORF (0.643) | -0.044 | [-0.082, -0.011] | 0.3 | **no** |
-| family | n_genes | 0.782 | ORF (0.891) | -0.109 | [-0.146, -0.076] | 0.018 | **no** |
-| family | mean_intergenic_len | 0.331 | ORF (0.272) | +0.060 | [0.003, 0.112] | 0.36 | **no** |
-| family | overlap_bp | 0.338 | ORF (0.318) | +0.020 | [-0.030, 0.064] | 0.72 | **no** |
+| cl95 | coding_fraction | 0.376 | ORF (0.223) | +0.153 | [0.077, 0.230] | 0.00074 | yes |
+| cl95 | gene_density | 0.776 | ORF (0.588) | +0.188 | [0.140, 0.235] | <1e-4 | yes |
+| cl95 | noncoding_bp | 0.766 | ORF (0.675) | +0.091 | [0.036, 0.146] | 0.0032 | yes |
+| cl95 | n_genes | 0.895 | ORF (0.900) | -0.005 | [-0.030, 0.020] | 0.66 | **no** |
+| cl95 | mean_intergenic_len | 0.554 | ORF (0.335) | +0.219 | [0.186, 0.252] | <1e-4 | yes |
+| cl95 | overlap_bp | 0.623 | ORF (0.387) | +0.236 | [0.188, 0.283] | <1e-4 | yes |
+| family | coding_fraction | 0.207 | ORF (0.182) | +0.025 | [-0.085, 0.134] | 0.64 | **no** |
+| family | gene_density | 0.532 | ORF (0.520) | +0.012 | [-0.110, 0.134] | 0.84 | **no** |
+| family | noncoding_bp | 0.599 | ORF (0.643) | -0.044 | [-0.132, 0.044] | 0.3 | **no** |
+| family | n_genes | 0.782 | ORF (0.891) | -0.109 | [-0.196, -0.021] | 0.018 | **no** |
+| family | mean_intergenic_len | 0.331 | ORF (0.272) | +0.060 | [-0.076, 0.195] | 0.36 | **no** |
+| family | overlap_bp | 0.338 | ORF (0.318) | +0.020 | [-0.095, 0.134] | 0.72 | **no** |

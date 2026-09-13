@@ -12,8 +12,9 @@ Produz:
     sob CV aleatória E cluster-aware.
   - Controle de precisão: compara FP8 vs bf16 na(s) mesma(s) camada(s) (mostra
     que FP8 não degrada a representação -> justifica usar os números FP8).
-  - Controle de dimensionalidade: reduz o 20B (8192-dim) a 4096 via PCA e re-proba
-    (separa efeito de escala de efeito de dimensionalidade; o 6-mer e o 7B têm 4096).
+  - Controle de dimensionalidade: implementado em pca_control.py, que projeta 20B e 7B
+    num subespaço PCA comum de 150 componentes (não 4096: o PCA é limitado por
+    min(n_treino, n_features), ~279 no alvo família).
   - Figura de sensibilidade de camada (accuracy/R² x profundidade, por tipo de alvo).
   - scale_metrics.md com as tabelas.
 
