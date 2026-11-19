@@ -8,6 +8,17 @@ abstract: >-
   comparator; neither fine-tuned) on 19,429 RefSeq viral genomes, across
   representation probing, genomic-feature decoding and generative completion.
 type: software
+version: v1.0.0
+date-released: 2026-11-19
+doi: 10.5281/zenodo.24378037
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24378037
+    description: Zenodo concept DOI, always resolving to the latest archived release
+  - type: doi
+    value: 10.5281/zenodo.24378038
+    description: Zenodo DOI of release v1.0.0, the state submitted with the third revision
+repository-code: "https://github.com/omicsintellab/benchmark-evo2-viral-genomes-reproducibility"
 authors:
   - family-names: Amgarten
     given-names: Deyvid

@@ -8,7 +8,7 @@ Code, curated inputs and cached metrics for:
 > Submitted to *Frontiers in Bioinformatics* (Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*; **revised version submitted 2026-08-23** after a major-revision decision; a second revision (R2), limited to consistency of wording, methods documentation and statistical reporting, followed on 2026-09-13; a **third revision (R3)**, answering an additional reviewer, followed on 2026-11-19 and requested conversion from Brief Research Report to **Original Research**. The title above is the revised one; the version submitted in July was titled *"Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2"*.
 >
 > Preprint: **bioRxiv** [10.64898/2026.07.14.738542](https://doi.org/10.64898/2026.07.14.738542).
-> This repository is archived on **Zenodo**: [10.5281/zenodo.PENDING](https://doi.org/10.5281/zenodo.PENDING) (concept DOI, resolves to the latest release).
+> This repository is archived on **Zenodo**: [10.5281/zenodo.24378037](https://doi.org/10.5281/zenodo.24378037) (concept DOI, resolves to the latest release). The state submitted with the third revision is release **v1.0.0**, [10.5281/zenodo.24378038](https://doi.org/10.5281/zenodo.24378038) — that is the DOI the manuscript cites.
 
 The study benchmarks the **Evo 2 20B checkpoint** (`evo2_20b`, 1M-token context; neither it nor the 7B comparator was fine-tuned) on a pre-registered corpus of **19,429 RefSeq viral genomes**, along three axes:
 
@@ -140,7 +140,7 @@ Everything needed to identify the exact genomes analysed, derived entirely from 
 
 See [`CITATION.cff`](CITATION.cff). Please also cite Evo 2 (Brixi et al., 2025), RefSeq (O'Leary et al., 2016), the ICTV VMR (MSL41, cited by version; Lefkowitz et al., 2018 for the database itself) and Baltimore (1971) for the replication classes.
 
-To cite this repository, use the Zenodo concept DOI [10.5281/zenodo.PENDING](https://doi.org/10.5281/zenodo.PENDING), which always resolves to the latest archived release.
+To cite this repository, use the Zenodo concept DOI [10.5281/zenodo.24378037](https://doi.org/10.5281/zenodo.24378037), which always resolves to the latest archived release. To cite the exact snapshot behind a particular version of the paper, use that release's own DOI instead — [10.5281/zenodo.24378038](https://doi.org/10.5281/zenodo.24378038) for **v1.0.0**, the state submitted with the third revision.
 
 ## License
 
