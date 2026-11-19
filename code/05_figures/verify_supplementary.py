@@ -97,7 +97,13 @@ for r in t5b[1:]:
 
 # ---------- S6: primary contrasts
 ci = J("ci_consistency.json")["schemes"]
-SCH = {"Identity-clustered (pre-registered)": "cl95", "Family-grouped": "family"}
+# O rótulo do esquema primário mudou de "(pre-registered)" para "(primary)" na R3 (ponto 18
+# do revisor adicional): o arquivo versionado fixa os parâmetros de clusterização, não o
+# protocolo de CV. Os dois rótulos são aceitos para que o verificador siga valendo para os
+# suplementares já submetidos.
+SCH = {"Identity-clustered (pre-registered)": "cl95",
+       "Identity-clustered (primary)": "cl95",
+       "Family-grouped": "family"}
 NICE = {"Coding fraction":"coding_fraction","Gene density":"gene_density","Non-coding bp":"noncoding_bp",
         "Gene count":"n_genes","Mean intergenic length":"mean_intergenic_len","Gene overlap":"overlap_bp"}
 for r in tables[5+1][1:]:

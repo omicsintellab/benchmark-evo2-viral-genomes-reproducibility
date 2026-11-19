@@ -5,15 +5,18 @@ Code, curated inputs and cached metrics for:
 > **Decoding taxonomy and genome-level architecture from Evo 2 embeddings of viral genomes: a linear-probe benchmark against compositional baselines**
 > Amgarten D., Schinaid A., de Mello Malta F., Marra A. R., Pinho J. R. R.
 >
-> Submitted to *Frontiers in Bioinformatics* (Brief Research Report, Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*; **revised version submitted 2026-08-23** after a major-revision decision; a second revision (R2), limited to consistency of wording, methods documentation and statistical reporting, followed. The title above is the revised one; the version submitted in July was titled *"Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2"*.
+> Submitted to *Frontiers in Bioinformatics* (Genomic Analysis section) on 2026-07-14, to the Research Topic *"Unveiling generative models in microbial genomics: validation, synthetic data, and scalable genome-scale applications"*; **revised version submitted 2026-08-23** after a major-revision decision; a second revision (R2), limited to consistency of wording, methods documentation and statistical reporting, followed on 2026-09-13; a **third revision (R3)**, answering an additional reviewer, followed on 2026-11-19 and requested conversion from Brief Research Report to **Original Research**. The title above is the revised one; the version submitted in July was titled *"Genomic foundation model embeddings encode higher-order viral genome architecture beyond sequence composition: a benchmark of Evo 2"*.
 >
 > Preprint: **bioRxiv** [10.64898/2026.07.14.738542](https://doi.org/10.64898/2026.07.14.738542).
+> This repository is archived on **Zenodo**: [10.5281/zenodo.PENDING](https://doi.org/10.5281/zenodo.PENDING) (concept DOI, resolves to the latest release).
 
-The study benchmarks the **Evo 2 20B base model** (with the 7B model as a scale comparator; neither fine-tuned) on a pre-registered corpus of **19,429 RefSeq viral genomes**, along three axes:
+The study benchmarks the **Evo 2 20B checkpoint** (`evo2_20b`, 1M-token context; neither it nor the 7B comparator was fine-tuned) on a pre-registered corpus of **19,429 RefSeq viral genomes**, along three axes:
 
 1. **Representation** — linear probes decoding Baltimore class, host domain and viral family from mean-pooled embeddings.
 2. **Feature decoding** — ridge probes recovering genome architecture (coding fraction, gene density, gene overlap, …), benchmarked against ten baselines in two classes: compositional (k-mers for k = 3–6, multi-k, codon and dicodon frequencies, GC+length) and annotation-/ORF-derived (a six-frame ORF summary and a combined representation).
 3. **Generation** — teacher-forced cross-entropy (bits/nt) and fragment completion on a leakage-safe set of eukaryote-infecting viruses (held out of Evo 2's training corpus) versus a bacteriophage comparator, whose clade is documented as included in the training corpus.
+
+**On the two checkpoints.** The comparison between `evo2_20b` and `evo2_7b` is a comparison of *checkpoints*, not of pretraining scale. The official Evo 2 release (v0.5.0) states that the 20B 1M-context checkpoint was produced by model surgery of Evo 2 40B — layers identified as removable by logit-lens analysis were dropped — **without additional training**. Its 24 blocks are therefore the surviving blocks of a 50-block trained stack, so `blocks.23` is the deepest *surviving* block (~46% of the trained depth), not a late layer. Architecture is taken from the official configuration files (`evo2/configs/evo2-20b-1m.yml`: 24 blocks, hidden size 8,192; the 7B: 32 blocks, 4,096), not from the Hugging Face model card, whose "50 layers" is the 40B's value. The suffix `_base` in the Evo 2 release denotes the 8K-context variants, so "base model" is not used here for `evo2_20b`.
 
 ---
 
@@ -74,6 +77,7 @@ Run in order. Stages 2 and 4 need a GPU with the [Evo 2](https://github.com/ArcI
 | 4. Generation | [`code/04_generation/`](code/04_generation) | Teacher-forced perplexity and prompt→gap completion against a 4th-order Markov baseline. | GPU |
 | 5. Figures | [`code/05_figures/`](code/05_figures) | Plots and metric tables from the cached JSONs. | CPU |
 | 6. Revision R1 | [`code/06_revision_r1/`](code/06_revision_r1) | Two experiments added during peer review: a **block-shuffling control** for long-range genome arrangement, and a **re-run of generation that persists the generated sequences**, with a decoding sweep. Both write to `results/json/`. | GPU (single H100 80 GB; see `README-gpu.md`) |
+| 7. Revision R3 | [`code/07_revision_r3/`](code/07_revision_r3) | Four controls added in the third review round, all from cached artefacts: ridge-penalty saturation and the six primary contrasts on an extended grid, genome length as a probe target, within-genome paired tests for the generation figure, and the export of the Baltimore mapping table. | CPU |
 
 ### Analyses added during peer review
 
@@ -94,6 +98,18 @@ every number in the revised manuscript and its supplementary tables regenerates 
 | The single supplementary file of the revision, ten tables in order of citation | `code/05_figures/make_supplementary.py` | `results/tables/supplementary_material_R1.md` |
 | Are the numbers in the submitted supplementary file the ones in these artefacts? | `code/05_figures/verify_supplementary.py --docx <file>` | 335 cell-level checks, read-only |
 
+Four more were added in the **third round (R3)**, under [`code/07_revision_r3/`](code/07_revision_r3). Each analysis script reproduces a published value as a positive control and aborts if it does not match to six decimals (the identity-clustered R² of gene density, 0.775618; the published deltas of coding fraction and gene density):
+
+| Question raised in review | Script | Cached result |
+|---|---|---|
+| Does the ridge penalty saturate the published grid, and do the six primary contrasts survive an extended grid? | `code/07_revision_r3/alpha_length_r3.py`, `contrast_wide_grid_r3.py` | `alpha_length_r3.json`, `contrast_wide_grid_r3.json` → Supplementary Tables S11a, S11b |
+| Is genome length decodable, and could pooled-window count explain the architecture signal? | `code/07_revision_r3/alpha_length_r3.py` (single-window subset) | `alpha_length_r3.json` → Supplementary Table S12 |
+| What is the dispersion behind the generation figure, and do the Evo 2 vs Markov differences hold within genome? | `code/07_revision_r3/generation_dispersion_r3.py` | `generation_dispersion_r3.json` |
+| What exactly maps a VMR genome-type string to a Baltimore class, and what falls through? | `code/07_revision_r3/export_baltimore_mapping.py` | `data/baltimore_mapping.tsv` |
+| The three R3 supplementary tables | `code/07_revision_r3/make_supp_table_r3.py` | `results/tables/supplementary_tables_r3.md` |
+
+**Reported on both grids, primary numbers unchanged.** The penalty grid declared in the manuscript, `{1, 10, 100, 1000}`, is saturated at its upper bound in essentially every fold for both representations — and in 100% of folds for the 6-mer baseline, whose optimum lies at 3,162–10,000. On an extended grid (10⁻¹ to 10⁶) direction and significance are unchanged (6 of 6 contrasts survive Holm correction under both CV schemes), but the magnitudes fall by 20–25%, because the published grid penalised the *baseline* more than the representation under test. The published grid remains the primary analysis, since it was fixed before the data were seen; both are reported side by side in Table S11b. The ten baselines of Supplementary Table S7 were **not** re-tuned.
+
 Model checkpoints are **not** redistributed here — obtain `evo2_20b` / `evo2_7b` from the [official Evo 2 release](https://github.com/ArcInstitute/evo2) and pass the path via `--weights-local`.
 
 ---
@@ -104,12 +120,13 @@ Everything needed to identify the exact genomes analysed, derived entirely from 
 
 | File | Contents |
 |---|---|
-| `corpus_design.yaml` | The **pre-registration** (written for the project's fine-tuning corpus): quota groups, identity-clustering parameters and the cluster-aware split requirement used by this benchmark. Its length and N cut-offs apply to the fine-tuning selection only — see [`data/README.md`](data/README.md). |
+| `corpus_design.yaml` | The **versioned design document** written for the project's fine-tuning corpus, fixed before analysis: quota groups, identity-clustering parameters and the cluster-aware split requirement used by this benchmark. Its length and completeness cut-offs sit inside the `v1_refseq:` block and apply to the fine-tuning selection only, so they were not applied to this benchmark — see [`data/README.md`](data/README.md). It is a versioned file in a repository, not a registration with a third-party registry. |
 | `corpus_manifest.tsv.gz` | The 19,429-genome corpus: accession, family, genus, Baltimore class, host domain, quota group, length. |
 | `genome_features.tsv.gz` | Per-genome architectural features (coding fraction, gene density, gene overlap, intergenic statistics, GC, …) — the regression targets. |
 | `probe_subset_baltimore.tsv` | The 981 accessions used for the Baltimore probe. |
 | `probe_subset_features.tsv` | The 1,200 accessions used for the feature, host and family probes (union with the above: 1,912 genomes). |
 | `cl95_cluster.tsv` | MMseqs2 linclust map (95% identity / 85% coverage) used for group-aware cross-validation. |
+| `baltimore_mapping.tsv` | The rule mapping each ICTV VMR "Genome" string to a Baltimore class (exact match after normalisation), with the counts it yields in each population and the unassigned residue (3,238 of 19,429 corpus records; 240 of 1,200 in the feature subset). Exported from the code that produced the corpus, not transcribed. |
 
 **Not in this repository, by size:** the genome FASTA (rebuildable from the accession list — see `data/README.md`) and the cached embedding matrices (~30 MB for the 7B; ~290 MB for the five 20B layers). Per the manuscript's Data Availability statement, cached embeddings are **available from the authors on request**.
 
@@ -121,7 +138,9 @@ Everything needed to identify the exact genomes analysed, derived entirely from 
 
 ## Citation
 
-See [`CITATION.cff`](CITATION.cff). Please also cite Evo 2 (Brixi et al., 2025), RefSeq (O'Leary et al., 2016) and the ICTV VMR (Lefkowitz et al., 2018).
+See [`CITATION.cff`](CITATION.cff). Please also cite Evo 2 (Brixi et al., 2025), RefSeq (O'Leary et al., 2016), the ICTV VMR (MSL41, cited by version; Lefkowitz et al., 2018 for the database itself) and Baltimore (1971) for the replication classes.
+
+To cite this repository, use the Zenodo concept DOI [10.5281/zenodo.PENDING](https://doi.org/10.5281/zenodo.PENDING), which always resolves to the latest archived release.
 
 ## License
 

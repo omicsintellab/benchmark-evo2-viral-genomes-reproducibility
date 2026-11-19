@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""Painel combinado Figura 1 (2x2) — fusão das antigas Figuras 1 e 2 do Brief
-Research Report, para caber no limite de 4 Figuras/Tabelas da Frontiers in
-Bioinformatics (Brief Research Report).
+"""Painel combinado Figura 1 — fusão das antigas Figuras 1 e 2, para caber no limite de
+4 Figuras/Tabelas da Frontiers in Bioinformatics.
 
 Reusa a MESMA lógica/dados de make_figures_20b.py (nenhum recômputo de CV):
   A = confusion matrix Baltimore (ex-Fig.1a)
   B = accuracy Baltimore/Host/Family vs baselines (ex-Fig.1b)
   C = R^2 das 8 features vs baselines (ex-Fig.2a)
-  D = PCA do embedding colorido por coding fraction (ex-Fig.2b)
+
+O painel de PCA colorido por coding fraction (ex-Fig.2b, painel D até a R2) saiu na R3:
+quantificado, PC1 e PC2 correlacionam com coding fraction a Spearman -0,222 e +0,176 e
+explicam 1,7% da variância, contra R^2 0,606 do probe sobre as 8.192 dimensões, de modo que
+o painel sugeria uma organização que o teste não sustenta. Fica reproduzível com --with-pca,
+que devolve o layout 2x2 de quatro painéis submetido até a R2.
 
 Saída: figure1_combined.svg/png
 """
-import os, json, numpy as np
+import os, sys, json, numpy as np
 import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -109,14 +113,24 @@ def mean_fn(t, which):
     return get_base_meanstd(t, which)
 
 
-def figure1_combined():
-    fig = plt.figure(figsize=(180 * MM, 155 * MM))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1, 1.05], hspace=0.38, wspace=0.32,
-                           top=0.93, bottom=0.07)
-    axA = fig.add_subplot(gs[0, 0])
-    axB = fig.add_subplot(gs[0, 1])
-    axC = fig.add_subplot(gs[1, 0])
-    axD = fig.add_subplot(gs[1, 1])
+def figure1_combined(with_pca=False):
+    if with_pca:
+        fig = plt.figure(figsize=(180 * MM, 155 * MM))
+        gs = fig.add_gridspec(2, 2, height_ratios=[1, 1.05], hspace=0.38, wspace=0.32,
+                              top=0.93, bottom=0.07)
+        axA = fig.add_subplot(gs[0, 0])
+        axB = fig.add_subplot(gs[0, 1])
+        axC = fig.add_subplot(gs[1, 0])
+        axD = fig.add_subplot(gs[1, 1])
+    else:
+        # três painéis: A e B em cima, C ocupando a faixa de baixo inteira
+        fig = plt.figure(figsize=(180 * MM, 138 * MM))
+        gs = fig.add_gridspec(2, 2, height_ratios=[1.15, 0.85], hspace=0.26, wspace=0.32,
+                              top=0.92, bottom=0.10)
+        axA = fig.add_subplot(gs[0, 0])
+        axB = fig.add_subplot(gs[0, 1])
+        axC = fig.add_subplot(gs[1, :])
+        axD = None
 
     # A — confusion matrix (Baltimore, ex-Fig.1a)
     cm = art["cm"]; L = cm["labels"]; M = np.array(cm["M"])
@@ -151,14 +165,15 @@ def figure1_combined():
     axC.text(6.0, -0.24, "sequence composition", ha="center", fontsize=6, color="#666666", transform=axC.get_xaxis_transform())
     plab(axC, "c")
 
-    # D — PCA scatter colored by coding fraction (ex-Fig.2b)
-    PC1, PC2, cf = np.array(art["pca"]["PC1"]), np.array(art["pca"]["PC2"]), np.array(art["pca"]["coding_fraction"])
-    sc = axD.scatter(PC1, PC2, c=cf, cmap=SEQ, s=8, edgecolor="none", alpha=0.85, vmin=0, vmax=1)
-    axD.set_xlabel("PC1"); axD.set_ylabel("PC2")
-    axD.set_title(f"Evo 2 20B embedding PCA (n = {art['pca']['n']})", fontsize=8); clean(axD)
-    cb = fig.colorbar(sc, ax=axD, fraction=0.046, pad=0.04); cb.outline.set_linewidth(0.6)
-    cb.ax.tick_params(width=0.6, length=2, labelsize=6.5); cb.set_label("coding fraction", fontsize=6.5)
-    plab(axD, "d")
+    # D — PCA scatter colored by coding fraction (ex-Fig.2b; só com --with-pca, ver docstring)
+    if axD is not None:
+        PC1, PC2, cf = np.array(art["pca"]["PC1"]), np.array(art["pca"]["PC2"]), np.array(art["pca"]["coding_fraction"])
+        sc = axD.scatter(PC1, PC2, c=cf, cmap=SEQ, s=8, edgecolor="none", alpha=0.85, vmin=0, vmax=1)
+        axD.set_xlabel("PC1"); axD.set_ylabel("PC2")
+        axD.set_title(f"Evo 2 20B embedding PCA (n = {art['pca']['n']})", fontsize=8); clean(axD)
+        cb = fig.colorbar(sc, ax=axD, fraction=0.046, pad=0.04); cb.outline.set_linewidth(0.6)
+        cb.ax.tick_params(width=0.6, length=2, labelsize=6.5); cb.set_label("coding fraction", fontsize=6.5)
+        plab(axD, "d")
 
     handles = [Patch(color=NAVY, label="Evo 2 20B embedding (blocks.18)"),
                Patch(color=ORANGE, label="6-mer composition"),
@@ -166,11 +181,12 @@ def figure1_combined():
     fig.legend(handles=handles, loc="upper center", ncol=3, frameon=False,
                bbox_to_anchor=(0.5, 0.995), handlelength=1.1, columnspacing=1.6, fontsize=7.5)
 
-    fig.savefig(f"{OUT_DIR}/figure1_combined.svg")
-    fig.savefig(f"{OUT_DIR}/figure1_combined.png", dpi=300)
+    stem = "figure1_combined_withpca" if with_pca else "figure1_combined"
+    fig.savefig(f"{OUT_DIR}/{stem}.svg")
+    fig.savefig(f"{OUT_DIR}/{stem}.png", dpi=300)
     plt.close(fig)
-    print("figure1_combined")
+    print(stem, "(4 painéis)" if with_pca else "(3 painéis, versão R3)")
 
 
 if __name__ == "__main__":
-    figure1_combined()
+    figure1_combined(with_pca="--with-pca" in sys.argv)
