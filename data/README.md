@@ -2,11 +2,11 @@
 
 All files here derive from **public sources**: the NCBI RefSeq viral release (May 2026) and the ICTV Virus Metadata Resource (MSL41). No sequence data are redistributed — only accessions, taxonomy and annotation-derived statistics.
 
-## `corpus_design.yaml` — the pre-registration
+## `corpus_design.yaml` — the versioned design document
 
-Quotas (Baltimore class × host domain), quality cut-offs, sanitisation filters, dedup parameters (MMseqs2: 95% identity, 85% coverage) and split seeds, fixed before the data were inspected.
+Quotas (Baltimore class × host domain), quality cut-offs, sanitisation filters, dedup parameters (MMseqs2: 95% identity, 85% coverage) and split seeds, fixed before the data were inspected. It is a versioned file in this repository, not a registration deposited with a third-party registry, and the manuscript describes it in those terms.
 
-**Scope for this benchmark.** The file was written for the project's fine-tuning corpus. The benchmark uses its **quota groups** and its **identity-clustering parameters** (the `quota_group` column and `cl95_cluster.tsv`), and follows its requirement of cluster-aware splitting. It does **not** apply the fine-tuning cut-offs: `min_length: 1000` and `sanitize.max_N_fraction` are enforced only in `code/01_corpus/build_v1_selection.py`, so the corpus manifest keeps 573 records shorter than 1,000 bp, 63 of them in the probe subsets (shortest 266 bp). The `split` block (90/5/5 train/val/test) is the fine-tuning split; the probes use 5-fold × 3-repeat cross-validation, which was not pre-registered. The `v2` changelog entry (2026-06-29) changes the fine-tuning balancing policy only. `meta.version` is bumped on any change, with the rationale recorded in the changelog block and in git history. Consumed by `code/01_corpus/compose_v1_groups.py`.
+**Scope for this benchmark.** The file was written for the project's fine-tuning corpus, and the division is visible in its own structure rather than argued after the fact: the identity/coverage parameters and the cluster-aware split requirement that this benchmark uses sit in the block **common to both corpora**, whereas `min_length: 1000` and the completeness filter sit **inside the `v1_refseq:` block** and the ambiguous-base cut-off sits in the sanitisation stage of that pipeline. The benchmark therefore uses its **quota groups** and its **identity-clustering parameters** (the `quota_group` column and `cl95_cluster.tsv`), and follows its requirement of cluster-aware splitting. It does **not** apply the fine-tuning cut-offs: `min_length: 1000` and `sanitize.max_N_fraction` are enforced only in `code/01_corpus/build_v1_selection.py`, so the corpus manifest keeps 573 records shorter than 1,000 bp, 63 of them in the probe subsets (shortest 266 bp). The `split` block (90/5/5 train/val/test) is the fine-tuning split; the probes use 5-fold × 3-repeat cross-validation, which was not pre-registered. The `v2` changelog entry (2026-06-29) changes the fine-tuning balancing policy only. `meta.version` is bumped on any change, with the rationale recorded in the changelog block and in git history. Consumed by `code/01_corpus/compose_v1_groups.py`.
 
 ## `corpus_manifest.tsv.gz` — the 19,429-genome corpus
 
@@ -47,9 +47,25 @@ The CpG and UpA observed/expected dinucleotide ratios used as low-order composit
 
 The exact genomes drawn into each probe, so that results can be reproduced on the same samples rather than on a fresh draw:
 
-- **Baltimore probe** — 150 genomes per class, n = 981 across seven classes.
+- **Baltimore probe** — n = 981 across seven classes, with **unequal** per-class counts: the 150-per-class quota is met in classes I–V, but only 94 records of class VI and 137 of class VII exist in the corpus after the Baltimore mapping, so those classes are taken whole.
 - **Feature / host / family probes** — 120 genomes per quota group, n = 1,200 (family restricted to families with ≥ 25 members: n = 349).
 - Union of the two subsets: **1,912 genomes** — the set embedded for the layer sweep and the scale comparison.
+
+## `baltimore_mapping.tsv` — how a VMR genome-type string becomes a Baltimore class
+
+Exported by `code/07_revision_r3/export_baltimore_mapping.py` from the dictionary used to build the corpus (`code/01_corpus/compose_v1_groups.py`, `BALT`), so the table cannot drift from the code.
+
+The rule is an **exact match** on the ICTV VMR `Genome` field after normalisation (lowercased, whitespace removed). Strings that match no key are left **unassigned**:
+
+| Column | Description |
+|---|---|
+| `vmr_genome_field_normalised` | The normalised VMR string, or `<any other value, or missing>` for the residual row. |
+| `baltimore_class` | `I`–`VII`, or `?` for unassigned. |
+| `rule` | The matching rule applied. |
+| `n_corpus_19429`, `n_feature_subset_1200`, `n_baltimore_probe_981` | Counts the rule yields in each population (given once per class, on its first row). |
+| `class_note` | Which VMR strings the class accepts. |
+
+**Unassigned records** — 3,238 of the 19,429 corpus records (16.7%) and 240 of the 1,200 in the feature subset (20.0%) — are **excluded from the Baltimore probe** and **retained** in the feature subset, where they are summarised separately. This is where ambisense genomes (*Arenaviridae*, segmented families of *Bunyavirales*) and unsigned-ssRNA records fall: the VMR records them with strings the dictionary does not key, and they are not forced into class IV or V.
 
 ## `cl95_cluster.tsv`
 

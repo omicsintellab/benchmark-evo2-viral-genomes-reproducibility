@@ -1,0 +1,16 @@
+vmr_genome_field_normalised	baltimore_class	rule	n_corpus_19429	n_feature_subset_1200	n_baltimore_probe_981	class_note
+dsdna	I	exact match after normalisation (lowercase, whitespace removed)	6311.0	325.0	150.0	dsDNA
+ssdna	II	exact match after normalisation (lowercase, whitespace removed)	2432.0	139.0	150.0	ssDNA (either polarity, including (+/-))
+ssdna(+)	II	exact match after normalisation (lowercase, whitespace removed)				ssDNA (either polarity, including (+/-))
+ssdna(+/-)	II	exact match after normalisation (lowercase, whitespace removed)				ssDNA (either polarity, including (+/-))
+ssdna(-)	II	exact match after normalisation (lowercase, whitespace removed)				ssDNA (either polarity, including (+/-))
+dsrna	III	exact match after normalisation (lowercase, whitespace removed)	1663.0	121.0	150.0	dsRNA
+ssrna(+)	IV	exact match after normalisation (lowercase, whitespace removed)	3549.0	135.0	150.0	ssRNA(+)
+ssrna+	IV	exact match after normalisation (lowercase, whitespace removed)				ssRNA(+)
+ssrnapositive	IV	exact match after normalisation (lowercase, whitespace removed)				ssRNA(+)
+ssrna(-)	V	exact match after normalisation (lowercase, whitespace removed)	2005.0	120.0	150.0	ssRNA(-)
+ssrna-	V	exact match after normalisation (lowercase, whitespace removed)				ssRNA(-)
+ssrnanegative	V	exact match after normalisation (lowercase, whitespace removed)				ssRNA(-)
+ssrna-rt	VI	exact match after normalisation (lowercase, whitespace removed)	94.0	47.0	94.0	ssRNA-RT
+dsdna-rt	VII	exact match after normalisation (lowercase, whitespace removed)	137.0	73.0	137.0	dsDNA-RT
+<any other value, or missing>	?	unassigned: excluded from the Baltimore probe, retained in the feature subset and summarised separately	3238.0	240.0	0.0	no key matched: ambisense genomes and records whose VMR field carries no polarity
