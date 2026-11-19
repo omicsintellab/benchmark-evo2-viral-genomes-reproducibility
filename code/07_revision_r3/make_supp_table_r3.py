@@ -54,10 +54,10 @@ def main():
     L.append("\n## Table S11a. Ridge penalty selected inside each training fold\n")
     L.append(f"Population: the {ct['design']['population']:,} records with an assigned family; "
              f"{ct['design']['cv']['splits']} folds x {ct['design']['cv']['repeats']} repeats "
-             f"(15 estimates), seed {ct['design']['cv']['seed']}. The published grid is "
+             f"(15 estimates), seed {ct['design']['cv']['seed']}. The grid declared in the manuscript is "
              "{1, 10, 100, 1000}; the extended grid spans 1e-1 to 1e6 in 15 steps. "
              "\"At grid max\" is the share of folds selecting the largest penalty of the "
-             "published grid.\n")
+             "declared grid.\n")
     L.append("| Representation | Target | Scheme | At grid max | Median penalty, extended grid |")
     L.append("|---|---|---|---|---|")
     for rep, rep_label in (("evo2_20b_blocks18", "Evo 2 20B blocks.18"), ("6mer", "6-mer")):
@@ -73,8 +73,8 @@ def main():
     L.append("Evo 2 20B blocks.18 versus the 6-mer baseline, corrected resampled t-test "
              "(Nadeau and Bengio, 2003) with Holm correction inside the set of six, as in "
              "Table S6. R² is the mean over the 15 estimates.\n")
-    L.append("| Scheme | Target | R² Evo 2 (published / extended) | R² 6-mer (published / extended) "
-             "| Delta (published) | Delta (extended) | 95% CI (extended) | p Holm (extended) |")
+    L.append("| Scheme | Target | R² Evo 2 (declared / extended) | R² 6-mer (declared / extended) "
+             "| Delta (declared) | Delta (extended) | 95% CI (extended) | p Holm (extended) |")
     L.append("|---|---|---|---|---|---|---|---|")
     for s in ("cl95", "family"):
         for t in TARGET_LABEL:
@@ -88,11 +88,11 @@ def main():
     nsig = {k: sum(v["significant_holm"] for v in ct["contrasts"][k].values())
             for k in ct["contrasts"]}
     L.append(f"\nContrasts significant after Holm correction: "
-             f"identity-clustered {nsig['cl95|paper']}/6 on the published grid and "
+             f"identity-clustered {nsig['cl95|paper']}/6 on the declared grid and "
              f"{nsig['cl95|wide']}/6 on the extended grid; family-grouped "
              f"{nsig['family|paper']}/6 and {nsig['family|wide']}/6. Direction and significance "
              "are unchanged; the magnitude of the advantage falls, because the 6-mer baseline "
-             "was the more strongly affected of the two representations by the published grid.\n")
+             "was the more strongly affected of the two representations by the declared grid.\n")
 
     # ---------------- S12: genome length -------------------------------------
     d = al["design"]["population"]
@@ -104,15 +104,15 @@ def main():
              "subset the number of pooled windows is constant at one, so a pooled-window-count "
              "artefact cannot contribute. The GC-and-length control is omitted: log length is "
              "one of its two inputs.\n")
-    L.append("| Population | n | Scheme | R² (published grid) | R² (extended grid) |")
+    L.append("| Population | n | Scheme | R² (declared grid) | R² (extended grid) |")
     L.append("|---|---|---|---|---|")
     for pop, label in (("all", "All records with a family"),
-                       ("single_window", f"Single window (<= {d['window_bp']:,} bp)")):
+                       ("single_window", f"Single window (\u2264 {d['window_bp']:,} bp)")):
         rec = al["length"][pop]
         for s in ("cl95", "family"):
             sr = rec["schemes"][s]
             L.append(f"| {label} | {rec['n']:,} | {SCHEME_LABEL[s]} | "
-                     f"{sr['paper']['r2_mean']:.3f} +- {sr['paper']['r2_std']:.3f} | "
+                     f"{sr['paper']['r2_mean']:.3f} \u00b1 {sr['paper']['r2_std']:.3f} | "
                      f"{sr['wide']['r2_mean']:.3f} |")
 
     dst = os.path.abspath(a.out)

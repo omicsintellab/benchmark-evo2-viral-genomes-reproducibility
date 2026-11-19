@@ -169,18 +169,43 @@ def figure3():
             "phg": (c["bits_evo"]["phage_seen"], c["bits_markov"]["phage_seen"])}
     kmer = {"euk": (c["kmer_evo"]["euk_heldout"], c["kmer_markov"]["euk_heldout"]),
             "phg": (c["kmer_evo"]["phage_seen"], c["kmer_markov"]["phage_seen"])}
-    slab = ["Eukaryotic\nviruses\n(held-out)", "Bacterio-\nphages\n(seen)"]
+    slab = ["Eukaryotic\nviruses\n(held-out)", "Bacterio-\nphages"]
     fig, (axA, axB, axC) = plt.subplots(1, 3, figsize=(180*MM, 68*MM)); x = np.arange(2)
+    # Barras de erro da R3 (#14 do terceiro revisor): IC95 sobre genomas, do
+    # generation_dispersion_r3.json. Antes da R3 os paineis B e C mostravam so as medias,
+    # sem nenhuma medida de dispersao.
+    disp_path = os.path.join(DATA_DIR, "generation_dispersion_r3.json")
+    disp = json.load(open(disp_path)) if os.path.exists(disp_path) else None
+    if disp is None:
+        print(f"[aviso] {disp_path} ausente: paineis B e C sairao sem barras de erro")
+
+    def ci_half(panel, group, series):
+        """Meia-largura do IC95 da media, ou None quando o cache nao esta presente."""
+        if disp is None:
+            return None
+        d = disp[panel][{"euk": "euk_heldout", "phg": "phage_seen"}[group]][series]
+        return (d["ci95"][1] - d["ci95"][0]) / 2
+
     axA.bar(x, [perp[s][0] for s in ["euk", "phg"]], 0.5, yerr=[perp[s][1] for s in ["euk", "phg"]],
             color=[ORANGE, NAVY], edgecolor="none", error_kw=dict(elinewidth=0.7, capsize=2.5, ecolor="#333333"))
     axA.set_xticks(x); axA.set_xticklabels(slab); axA.set_ylabel("bits / nucleotide")
-    axA.set_title("Genome perplexity, Evo 2 20B", fontsize=8); clean(axA); plab(axA, "a")
+    axA.set_title("Genome cross-entropy, Evo 2 20B", fontsize=8); clean(axA); plab(axA, "a")
     w = 0.34
-    for ax, dat, ylab, ttl, lbl in [(axB, bits, "gap bits / nt", "Completion: likelihood", "b"),
-                                     (axC, kmer, "k-mer cosine (gen vs real)", "Completion: composition", "c")]:
-        ax.bar(x - w/2, [dat[s][0] for s in ["euk", "phg"]], w, color=NAVY, edgecolor="none", label="Evo 2 20B")
-        ax.bar(x + w/2, [dat[s][1] for s in ["euk", "phg"]], w, color=GRAY, edgecolor="none", label="Markov-4")
+    ekw = dict(elinewidth=0.7, capsize=2.5, ecolor="#333333")
+    for ax, dat, panel, ylab, ttl, lbl in [
+            (axB, bits, "panel_B_completion_bits", "gap bits / nt", "Completion: likelihood", "b"),
+            (axC, kmer, "panel_C_kmer_cosine", "k-mer cosine (gen vs real)", "Completion: composition", "c")]:
+        e_evo = [ci_half(panel, s, "evo2") for s in ["euk", "phg"]]
+        e_mkv = [ci_half(panel, s, "markov") for s in ["euk", "phg"]]
+        ax.bar(x - w/2, [dat[s][0] for s in ["euk", "phg"]], w, color=NAVY, edgecolor="none",
+               label="Evo 2 20B", yerr=None if disp is None else e_evo, error_kw=ekw)
+        ax.bar(x + w/2, [dat[s][1] for s in ["euk", "phg"]], w, color=GRAY, edgecolor="none",
+               label="Markov-4", yerr=None if disp is None else e_mkv, error_kw=ekw)
         ax.set_xticks(x); ax.set_xticklabels(slab); ax.set_ylabel(ylab); ax.set_title(ttl, fontsize=8)
+        # folga no topo para a legenda nao encostar nas barras de erro acrescentadas na R3
+        top = max([dat[s][i] for s in ("euk", "phg") for i in (0, 1)])
+        ebar = max([e for e in (e_evo + e_mkv) if e is not None], default=0.0)
+        ax.set_ylim(0, (top + ebar) * 1.22)
         ax.legend(frameon=False, loc="upper right", handlelength=1.1); clean(ax); plab(ax, lbl)
     fig.tight_layout(w_pad=2.0)
     fig.savefig(f"{OUT_DIR}/figure3_20b.svg"); fig.savefig(f"{OUT_DIR}/figure3_20b.png", dpi=300); plt.close(fig)
